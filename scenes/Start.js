@@ -99,6 +99,7 @@ export default class Start extends Phaser.Scene {
         });
         loginButton.on('pointerup', () => {
             console.log('로그인 버튼 클릭');
+            this.scene.start('LoginScreen');
         });
 
         loginButton.on('pointerover', () => {
