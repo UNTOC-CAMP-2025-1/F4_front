@@ -1,14 +1,11 @@
 import Start from './scenes/Start.js';
+import Home from './scenes/Home.js';
 
 const config = {
     type: Phaser.AUTO,
     width: window.innerWidth,
     height: window.innerHeight,
-    scene: [Start],
-    scale: {
-        mode: Phaser.Scale.RESIZE,
-        autoCenter: Phaser.Scale.CENTER_BOTH //가운데 정렬
-    }
+    scene: [Start, Home]
 };
 
-new Phaser.Game(config);
+const game = new Phaser.Game(config);
