@@ -1,22 +1,25 @@
-// scenes/MainMenuScene.js
-export default class MainMenuScene extends Phaser.Scene {
+// Start.js
+export default class Start extends Phaser.Scene {
     constructor() {
-        super({ key: 'MainMenuScene' });
+        super('Start');
     }
 
     preload() {
+        this.load.image('back', 'assets/back.png');
+        this.load.image('title', 'assets/title.png');
         // 필요한 경우 이미지나 폰트 로딩 가능
     }
 
     create() {
         const centerX = this.cameras.main.width / 2;
         const centerY = this.cameras.main.height / 2;
-
+        
+        //배경
+        this.add.image(0, 0, 'back').setOrigin(0).setDisplaySize(this.cameras.main.width, this.cameras.main.height);
         // Title
-        this.add.text(centerX, centerY - 150, 'Title', {
-            fontSize: '48px',
-            color: '#ffffff'
-        }).setOrigin(0.5);
+        this.add.image(centerX, centerY - 100, 'title')
+            .setOrigin(0.5)
+            .setScale(0.9);
 
         // ‘가시가’ 버튼
         const startButton = this.add.text(centerX, centerY - 50, '시작', {
