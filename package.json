@@ -1,5 +1,8 @@
 {
   "dependencies": {
     "phaser": "^3.88.2"
+  },
+  "devDependencies": {
+    "lite-server": "^2.6.1"
   }
 }
