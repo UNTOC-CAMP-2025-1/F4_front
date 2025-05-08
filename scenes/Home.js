@@ -44,7 +44,7 @@ export default class Home extends Phaser.Scene {
         //heart_start button
         const heartStartImage = this.add.image(highscoreImage.x, highscoreImage.y + 330, 'heart_start')
             .setOrigin(0.5)
-            .setScale(1.2);
+            .setScale(0.47);
 
         this.tweens.add({
             targets: heartStartImage,
