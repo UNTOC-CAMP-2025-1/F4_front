@@ -129,6 +129,7 @@ export default class Start extends Phaser.Scene {
         });
         styleButton.on('pointerup', () => {
             console.log('테마 변경 버튼 클릭');
+            this.scene.start('Style');
         });
 
         styleButton.on('pointerover', () => {
