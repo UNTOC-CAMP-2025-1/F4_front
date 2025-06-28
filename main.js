@@ -7,6 +7,7 @@ const config = {
     type: Phaser.AUTO,
     width: window.innerWidth,
     height: window.innerHeight,
+    parent: 'game-container',
     scene: [Start, Home, LoginScreen, Style],
     dom: {
         createContainer: true
