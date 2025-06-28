@@ -19,27 +19,46 @@ export default class Home extends Phaser.Scene {
         
         console.log('background loaded');
 
-        //highscore
-        const highscoreImage = this.add.image(this.cameras.main.centerX-250, 120, 'highscore')
+        // highscore
+        const highscoreImage = this.add.image(this.cameras.main.centerX - 250, 120, 'highscore')
             .setOrigin(0.5)
             .setScale(0.8);
 
-        const highscoreText = this.add.text(highscoreImage.x + 90, highscoreImage.y, '로그인 필요', {
-            fontSize: '38px',
-            color: '#000000',
-            fontFamily: 'Arial'
-        }).setOrigin(0.5);
-
-        //coin
+        // coin
         const coinImage = this.add.image(highscoreImage.x + 600, highscoreImage.y, 'coin')
             .setOrigin(0.5)
             .setScale(0.8);
 
-        const coinText = this.add.text(coinImage.x + 50, coinImage.y, '0', {
-            fontSize: '38px',
-            color: '#000000',
+
+
+        //반투명 배경 그래픽 생성 함수
+        function createRoundedPanel(scene, x, y, width, height, radius, color, alpha) {
+            const graphics = scene.add.graphics({ x: 0, y: 0 });
+            graphics.fillStyle(color, alpha);
+            graphics.fillRoundedRect(x - width / 2, y - height / 2, width, height, radius);
+            return graphics;
+        }
+
+        //점수-백연결해야함
+        this.highscoreValueText = this.add.text(highscoreImage.x, highscoreImage.y, '0', {
+            fontSize: '28px',
+            color: '#000',
             fontFamily: 'Arial'
         }).setOrigin(0.5);
+
+
+        //코인-백연결해야함함
+        this.coinValueText = this.add.text(coinImage.x + 70, coinImage.y, '0', {
+            fontSize: '28px',
+            color: '#000',
+            fontFamily: 'Arial'
+        }).setOrigin(0.5);
+
+        //테스트 용, 삭제해야함
+        const tempScore = 12345;
+        const tempCoins = 99;
+        this.highscoreValueText.setText(tempScore.toString());
+        this.coinValueText.setText(tempCoins.toString());
 
         //heart_start button
         const heartStartImage = this.add.image(highscoreImage.x, highscoreImage.y + 330, 'heart_start')
