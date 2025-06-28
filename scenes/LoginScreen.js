@@ -26,7 +26,7 @@ export default class LoginScreen extends Phaser.Scene {
         //LOGIN 타이틀
         this.add.dom(this.cameras.main.width / 2, this.cameras.main.height / 2 - 180).createFromHTML(`
             <div style="font-size: 55px; font-weight: bold; color: white;">
-                LOGIN
+                L O G I N
             </div>
         `);
 
@@ -55,25 +55,8 @@ export default class LoginScreen extends Phaser.Scene {
         `);
 
         this.add.dom(this.cameras.main.width / 2, this.cameras.main.height / 2 + 180).createFromHTML(`
-        <div style="display: flex; flex-direction: column; align-items: center; gap: 15px;">
-
-            <button id="signup-btn"
-                style="
-                    width: 220px;
-                    padding: 12px 20px;
-                    font-size: 18px;
-                    color: #857b98;
-                    background-color: rgba(255, 255, 255, 0.3);  /* 반투명 */
-                    border: none;
-                    border-radius: 30px;
-                    backdrop-filter: blur(10px);
-                    cursor: pointer;
-                ">
-                회원가입
-            </button>
-
-            <button id="changepw-btn"
-                style="
+            <style>
+                .fancy-button {
                     width: 220px;
                     padding: 12px 20px;
                     font-size: 18px;
@@ -83,11 +66,79 @@ export default class LoginScreen extends Phaser.Scene {
                     border-radius: 30px;
                     backdrop-filter: blur(10px);
                     cursor: pointer;
-                ">
-                비밀번호 변경
-            </button>
+                    transition: all 0.25s ease;
+                }
+                .fancy-button:hover {
+                    background-color: rgba(255, 255, 255, 0.5);
+                    transform: scale(1.05);
+                }
+            </style>
 
-        </div>
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 15px;">
+                <button id="signup-btn" class="fancy-button">회원가입</button>
+                <button id="changepw-btn" class="fancy-button">비밀번호 변경</button>
+            </div>
         `);
+
+        // 로그인 버튼 추가
+        this.add.dom(this.cameras.main.width / 2 + 280, this.cameras.main.height / 2 + 5).createFromHTML(`
+            <style>
+                .circle-login-btn {
+                    width: 50px;
+                    height: 50px;
+                    border-radius: 50%;
+                    border: none;
+                    background-color: rgba(255, 255, 255, 0.5);
+                    color: white;
+                    font-size: 24px;
+                    font-weight: bold;
+                    backdrop-filter: blur(5px);
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                }
+                .circle-login-btn:hover {
+                    background-color: rgba(255, 255, 255, 0.7);
+                    transform: scale(1.1);
+                }
+            </style>
+            <button id="login-btn" class="circle-login-btn">✔</button>
+        `);
+
+
+        this.time.delayedCall(0, () => {
+            const signupButton = document.getElementById('signup-btn');
+            if (signupButton) {
+                signupButton.addEventListener('click', () => {
+                    console.log('회원가입 버튼 클릭됨');
+                    this.scene.start('SignUp');
+                });
+            }
+
+            const changePwButton = document.getElementById('changepw-btn');
+            if (changePwButton) {
+                changePwButton.addEventListener('click', () => {
+                    console.log('비밀번호 변경 버튼 클릭됨');                        this.scene.start('ChangePW');
+                });
+            }
+
+            const loginBtn = document.getElementById('login-btn');
+            if (loginBtn) {
+                loginBtn.addEventListener('click', () => {
+                    const id = document.getElementById('username');
+                    const pw = document.getElementById('password');
+                    if (id.value && pw.value) {
+                        alert('로그인 시도됨');
+                        // TODO: 로그인 처리 후 씬 이동 등
+                    } else {
+                        alert('ID와 비밀번호를 모두 입력해주세요.');
+                    }
+                });
+            }
+
+
+        });
+
+
+
     }
 }
