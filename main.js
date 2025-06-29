@@ -4,13 +4,14 @@ import LoginScreen from './scenes/LoginScreen.js';
 import Style from './scenes/Style.js';
 import SignUp from './scenes/SignUp.js';
 import ChangePW from './scenes/ChangePW.js';
+import NewPW from './scenes/NewPW.js';
 
 const config = {
     type: Phaser.AUTO,
     width: window.innerWidth,
     height: window.innerHeight,
     parent: 'game-container',
-    scene: [Start, Home, LoginScreen, Style, SignUp, ChangePW],
+    scene: [Start, Home, LoginScreen, Style, SignUp, ChangePW, NewPW],
     dom: {
         createContainer: true
     }
