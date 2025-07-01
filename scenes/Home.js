@@ -41,16 +41,21 @@ export default class Home extends Phaser.Scene {
             fontFamily: 'Arial'
         }).setOrigin(0.5);
 
-        //heart_start button
         const heartStartImage = this.add.image(highscoreImage.x, highscoreImage.y + 330, 'heart_start')
             .setOrigin(0.5)
-            .setScale(0.47);
+            .setScale(0.47)
+            .setInteractive({ useHandCursor: true }); 
+
+        heartStartImage.on('pointerdown', () => {
+            console.log('Heart Start Clicked');
+            this.scene.start('RankBoard'); 
+        });
 
         this.tweens.add({
             targets: heartStartImage,
-            y: heartStartImage.y + 20, 
-            duration: 1500, 
-            yoyo: true, 
+            y: heartStartImage.y + 20,
+            duration: 1500,
+            yoyo: true,
             repeat: -1,
             ease: 'Sine.easeInOut'
         });
