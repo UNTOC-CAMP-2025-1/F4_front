@@ -1,6 +1,6 @@
-export default class MyScore extends Phaser.Scene {
+export default class BestScore extends Phaser.Scene {
     constructor() {
-        super('MyScore');
+        super('BestScore');
     }
 
     preload() {
@@ -40,7 +40,7 @@ export default class MyScore extends Phaser.Scene {
             .setOrigin(0.5)
             .setStrokeStyle(2, 0xBBA6F2, 0.3);
 
-        this.add.text(centerX - 350, 250, '나의 최고 기록 :', {
+        this.add.text(centerX - 350, 250, '최고의 지주(지렁이 주인이란 뜻) :', {
             fontFamily: 'Arial',
             fontSize: '32px',
             color: '#ffffff',
@@ -115,7 +115,7 @@ export default class MyScore extends Phaser.Scene {
         honorBoxGraphics.fillRoundedRect(-honorBoxWidth/2, -honorBoxHeight/2, honorBoxWidth, honorBoxHeight, honorBoxRadius-30);
 
         // 텍스트
-        const honorText = this.add.text(0, 0, '명예의 전당', {
+        const honorText = this.add.text(0, 0, 'revenge?', {
             fontSize: '30px',
             fontFamily: 'Arial',
             color: '#ffffff',
@@ -127,9 +127,9 @@ export default class MyScore extends Phaser.Scene {
         honorContainer.setSize(honorBoxWidth, honorBoxHeight);
         honorContainer.setInteractive(new Phaser.Geom.Rectangle(-honorBoxWidth/2, -honorBoxHeight/2, honorBoxWidth, honorBoxHeight), Phaser.Geom.Rectangle.Contains);
 
-        // 클릭 시 BestScore로 이동
+        // 클릭 시 Home로 이동
         honorContainer.on('pointerdown', () => {
-            this.scene.start('BestScore');
+            this.scene.start('Home');
         });
 
 
@@ -141,29 +141,5 @@ export default class MyScore extends Phaser.Scene {
             .on('pointerdown', () => {
                 this.scene.start('MyInfo');
             });
-        
-        // 초기 y 위치 저장
-        const honorBoxOriginalY = honorBoxY;
-
-        // pointerover: 아래로
-        honorContainer.on('pointerover', () => {
-            this.tweens.add({
-                targets: honorContainer,
-                y: honorBoxOriginalY + 5,
-                duration: 100,
-                ease: 'Power1'
-            });
-        });
-
-        // pointerout: 원래 위치로
-        honorContainer.on('pointerout', () => {
-            this.tweens.add({
-                targets: honorContainer,
-                y: honorBoxOriginalY,
-                duration: 100,
-                ease: 'Power1'
-            });
-        });
-
     }
 }
