@@ -42,7 +42,7 @@ export default class ProfileChange extends Phaser.Scene {
             .setStrokeStyle(2, 0xBBA6F2, 0.3)
             .setOrigin(0.5);
 
-        // 마스킹 영역용 그래픽
+        // 마스크 설정
         const maskGraphics = this.make.graphics({ x: 0, y: 0, add: false });
         maskGraphics.fillStyle(0xffffff);
         maskGraphics.fillRect(
@@ -51,13 +51,16 @@ export default class ProfileChange extends Phaser.Scene {
             scrollBoxWidth,
             scrollBoxHeight
         );
-
         const mask = maskGraphics.createGeometryMask();
 
         // 스크롤 컨테이너
         const profileKeys = ['profile1', 'profile2', 'profile3', 'profile4', 'profile5', 'profile6'];
-        const scrollContainer = this.add.container(scrollBoxX - scrollBoxWidth / 2 + 150, scrollBoxY - scrollBoxHeight / 2 + 80);
+        const scrollContainer = this.add.container(
+            scrollBoxX - scrollBoxWidth / 2 + 150,
+            scrollBoxY - scrollBoxHeight / 2 +110
+        );
         scrollContainer.setMask(mask);
+        const initialY = scrollContainer.y;
 
         const columns = 2;
         const spacingX = 200;
@@ -86,14 +89,14 @@ export default class ProfileChange extends Phaser.Scene {
         const totalRows = Math.ceil(profileKeys.length / columns);
         const contentHeight = totalRows * spacingY;
         const visibleHeight = scrollBoxHeight - 160;
-        const maxScrollY = 0;
-        const minScrollY = -(contentHeight - visibleHeight);
+
+        const minScrollY = initialY - (contentHeight - visibleHeight);
+        const maxScrollY = initialY;
 
         // 휠 스크롤
         this.input.on('wheel', (pointer, gameObjects, dx, dy) => {
             scrollContainer.y -= dy * 0.3;
-            if (scrollContainer.y < minScrollY) scrollContainer.y = minScrollY;
-            if (scrollContainer.y > maxScrollY) scrollContainer.y = maxScrollY;
+            scrollContainer.y = Phaser.Math.Clamp(scrollContainer.y, minScrollY, maxScrollY);
         });
 
         // 적용하기 버튼
@@ -103,7 +106,7 @@ export default class ProfileChange extends Phaser.Scene {
             .setInteractive({ useHandCursor: true })
             .on('pointerdown', () => {
                 console.log('적용된 프로필:', this.currentProfile.texture.key);
-                // TODO: 서버 저장 or 다음 씬 이동
+                // TODO: 저장 or 이동
             });
 
         // 뒤로가기 버튼
