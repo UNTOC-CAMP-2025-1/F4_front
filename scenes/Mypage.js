@@ -1,16 +1,16 @@
 // Style.js
-export default class Style extends Phaser.Scene {
+export default class Mypage extends Phaser.Scene {
     constructor() {
-        super('Style');
+        super('Mypage');
     }
 
     preload() {
-        this.load.image('styleBackground', 'assets/back.png');
+        this.load.image('MypageBackground', 'assets/back.png');
         this.load.image('arrow', 'assets/arrow.png');
     }
 
     create() {
-        const background = this.add.image(0, 0, 'styleBackground')
+        const background = this.add.image(0, 0, 'MypageBackground')
         .setOrigin(0)
         .setDisplaySize(this.cameras.main.width, this.cameras.main.height);
 

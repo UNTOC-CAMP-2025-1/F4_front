@@ -7,9 +7,6 @@ export default class Start extends Phaser.Scene {
     preload() {
         this.load.image('back', 'assets/back.png');
         this.load.image('title', 'assets/title.png');
-        this.load.image('startbutton', 'assets/startbutton.png');
-        this.load.image('loginbutton', 'assets/loginbutton.png');
-        this.load.image('stylebutton', 'assets/stylebutton.png');
         this.load.image('heart', 'assets/heart.png');
         // 필요한 경우 이미지나 폰트 로딩 가능
     }
@@ -52,94 +49,53 @@ export default class Start extends Phaser.Scene {
             ease: 'Sine.easeInOut'
         });
 
-        // START 버튼
-        const startButtonY = centerY;
-        const startButton = this.add.image(centerX, startButtonY, 'startbutton')
-            .setDisplaySize(300, 60) // 원하는 크기로 조절
-            .setInteractive({ useHandCursor: true });
+                // HTML 버튼 DOM
+        this.add.dom(centerX, centerY + 100).createFromHTML(`
+            <style>
+                .menu-button {
+                    width: 300px;
+                    padding: 15px;
+                    margin: 15px auto;
+                    font-size: 24px;
+                    font-family: Arial, sans-serif;
+                    color: white;
+                    background-color: rgba(255, 255, 255, 0.2);
+                    border: 2px solid white;
+                    border-radius: 12px;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    text-align: center;
+                    backdrop-filter: blur(5px);
+                }
 
-        const startText = this.add.text(centerX, startButtonY, 'START', {
-            fontSize: '32px',
-            color: '#ffffff',
-            fontFamily: 'Arial'
-        }).setOrigin(0.5);
+                .menu-button:hover {
+                    background-color: rgba(255, 255, 255, 0.4);
+                    color: #b35481;
+                    transform: scale(1.05);
+                    border-color: #b35481;
+                }
+            </style>
 
-        startButton.on('pointerdown', () => {
-            startText.setColor('#000000'); // 클릭 시 글자 색을 검은색으로 변경
-        });
-        
-        startButton.on('pointerup', () => {
-            this.scene.start('Home'); // 게임 씬으로 전환
-        });
+            <div style="display: flex; flex-direction: column; align-items: center;">
+                <button id="startBtn" class="menu-button">START</button>
+                <button id="loginBtn" class="menu-button">LOGIN</button>
+                <button id="mypageBtn" class="menu-button">MYPAGE</button>
+            </div>
+        `);
 
-        startButton.on('pointerover', () => {
-            startButton.setScale(0.6); // 버튼 크기 키우기
-            startText.setFontSize('36px'); // 글자 크기 키우기
-        });
+        // DOM 버튼 이벤트 연결
+        this.time.delayedCall(0, () => {
+            document.getElementById('startBtn').addEventListener('click', () => {
+                this.scene.start('Home');
+            });
 
-        startButton.on('pointerout', () => {
-            startButton.setScale(0.48); // 버튼 크기 원래대로
-            startText.setFontSize('32px'); // 글자 크기 원래대로
-        });
+            document.getElementById('loginBtn').addEventListener('click', () => {
+                this.scene.start('LoginScreen');
+            });
 
-        // LOGIN 버튼
-        const loginButtonY = startButtonY + 90;
-        const loginButton = this.add.image(centerX, loginButtonY, 'loginbutton')
-            .setDisplaySize(300, 60)
-            .setInteractive({ useHandCursor: true });
-
-        const loginText = this.add.text(centerX, loginButtonY, 'LOGIN', {
-            fontSize: '32px',
-            color: '#ffffff',
-            fontFamily: 'Arial'
-        }).setOrigin(0.5);
-
-        loginButton.on('pointerdown', () => {
-            loginText.setColor('#000000');
-        });
-        loginButton.on('pointerup', () => {
-            console.log('로그인 버튼 클릭');
-            this.scene.start('LoginScreen');
-        });
-
-        loginButton.on('pointerover', () => {
-            loginButton.setScale(0.6); // 버튼 크기 키우기
-            loginText.setFontSize('36px'); // 글자 크기 키우기
-        });
-
-        loginButton.on('pointerout', () => {
-            loginButton.setScale(0.48); // 버튼 크기 원래대로
-            loginText.setFontSize('32px'); // 글자 크기 원래대로
-        });
-
-        // STYLE 버튼
-        const styleButtonY = loginButtonY + 90;
-        const styleButton = this.add.image(centerX, styleButtonY, 'stylebutton')
-            .setDisplaySize(300, 60)
-            .setInteractive({ useHandCursor: true });
-
-        const styleText = this.add.text(centerX, styleButtonY, 'STYLE', {
-            fontSize: '32px',
-            color: '#ffffff',
-            fontFamily: 'Arial'
-        }).setOrigin(0.5);
-
-        styleButton.on('pointerdown', () => {
-            styleText.setColor('#000000');
-        });
-        styleButton.on('pointerup', () => {
-            console.log('테마 변경 버튼 클릭');
-            this.scene.start('Style');
-        });
-
-        styleButton.on('pointerover', () => {
-            styleButton.setScale(0.6); // 버튼 크기 키우기
-            styleText.setFontSize('36px'); // 글자 크기 키우기
-        });
-
-        styleButton.on('pointerout', () => {
-            styleButton.setScale(0.48); // 버튼 크기 원래대로
-            styleText.setFontSize('32px'); // 글자 크기 원래대로
+            document.getElementById('mypageBtn').addEventListener('click', () => {
+                this.scene.start('Mypage');
+            });
         });
         
     }  

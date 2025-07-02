@@ -76,7 +76,7 @@ export default class LoginScreen extends Phaser.Scene {
 
             <div style="display: flex; flex-direction: column; align-items: center; gap: 15px;">
                 <button id="signup-btn" class="fancy-button">회원가입</button>
-                <button id="changepw-btn" class="fancy-button">비밀번호 변경</button>
+                <button id="changepw-btn" class="fancy-button">비밀번호 찾기</button>
             </div>
         `);
 
@@ -98,7 +98,7 @@ export default class LoginScreen extends Phaser.Scene {
                 }
                 .circle-login-btn:hover {
                     background-color: rgba(255, 255, 255, 0.7);
-                    transform: scale(1.1);
+                    transform: scale(1.1); 
                 }
             </style>
             <button id="login-btn" class="circle-login-btn">✔</button>
