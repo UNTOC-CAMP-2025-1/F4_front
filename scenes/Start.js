@@ -49,7 +49,7 @@ export default class Start extends Phaser.Scene {
             ease: 'Sine.easeInOut'
         });
 
-                // HTML 버튼 DOM
+
         this.add.dom(centerX, centerY + 100).createFromHTML(`
             <style>
                 .menu-button {
@@ -83,7 +83,7 @@ export default class Start extends Phaser.Scene {
             </div>
         `);
 
-        // DOM 버튼 이벤트 연결
+
         this.time.delayedCall(0, () => {
             document.getElementById('startBtn').addEventListener('click', () => {
                 this.scene.start('Home');

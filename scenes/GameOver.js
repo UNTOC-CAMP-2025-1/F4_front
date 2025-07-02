@@ -19,47 +19,77 @@ export default class GameOver extends Phaser.Scene {
             .setDisplaySize(width, height)
             .setDepth(0);
 
-        // 타이틀 (트로피 + 순위 + 트로피)
-        const trophyScale = 0.2;
-        const spacing = 60;
+        this.add.dom(centerX+350, 130).createFromHTML(`
+        <style>
+            .score-title-container {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 60px;
+            transform: translateX(-50%);
+            animation: floatUpDown 2.5s ease-in-out infinite;
+            }
 
-        this.add.image(centerX - 120 - spacing, height * 0.15, 'trophy')
-            .setOrigin(0.5)
-            .setScale(trophyScale);
+            .score-title-text {
+            font-size: 80px;
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+            color: white;
+            }
 
-        this.add.text(centerX, height * 0.15, '순위', {
-            fontSize: '70px',
-            fontFamily: 'Arial',
-            color: '#ffffff',
-            fontStyle: 'bold'
-        }).setOrigin(0.5);
+            .trophy-img {
+            width: 150px;
+            height: 150px;
+            }
 
-        this.add.image(centerX + 120 + spacing, height * 0.15, 'trophy')
-            .setOrigin(0.5)
-            .setScale(trophyScale);
+            @keyframes floatUpDown {
+                0%, 100% {
+                transform: translateX(-50%) translateY(0px);
+                }
+                50% {
+                transform: translateX(-50%) translateY(-10px);
+                }
+            }
+        </style>
 
-        // 공통 스타일
-        const boxColor = 0xd8b0f7;
-        const boxAlpha = 0.6;
-        const cornerRadius = 60;
+        <div class="score-title-container">
+            <img class="trophy-img" src="assets/trophy.png" />
+            <div class="score-title-text">SCORE</div>
+            <img class="trophy-img" src="assets/trophy.png" />
+        </div>
+        `);
+        
+        //랭킹보이게하는부분
+        this.add.dom(centerX, height * 0.35-20).createFromHTML(`
+            <style>
+                .rank-box {
+                    width: 800px;
+                    height: 80px;
+                    background-color: rgba(216, 176, 247, 0.6);
+                    border-radius: 30px;
+                    font-size: 35px;
+                    font-weight: bold
+                    font-family: Arial, sans-serif;
+                    color: white;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    box-shadow: 0 4px 12px rgb(255, 255, 255);
+                }
+            </style>
+            <div class="rank-box" id="rank-text">당신의 순위는?...</div>
+        `);
 
-        // 순위 박스 (둥글고 반투명)
-        const rankBoxWidth = width * 0.5;
-        const rankBoxHeight = height * 0.1;
-        const rankBoxX = centerX - rankBoxWidth / 2;
-        const rankBoxY = height * 0.35 - rankBoxHeight / 2;
+        this.time.delayedCall(1000, () => {
+            const rankElement = document.getElementById('rank-text');
+            if (rankElement) {
+                rankElement.textContent = '3위';  // 예시
+            }
+        });
 
-        const rankBox = this.add.graphics();
-        const rankCorner = 30;
-        rankBox.fillStyle(boxColor, boxAlpha);
-        rankBox.fillRoundedRect(rankBoxX, rankBoxY, rankBoxWidth, rankBoxHeight, rankCorner);
 
-        // 텍스트 더미
-        this.rankText = this.add.text(centerX, height * 0.35, '당신의 순위: 불러오는 중...', {
-            fontSize: '30px',
-            fontFamily: 'Arial',
-            color: '#ffffff',
-        }).setOrigin(0.5);
+
 
         // 나중에 실제 백엔드에서 순위 불러오기 
         // this.loadRankFromServer(1);
@@ -71,53 +101,60 @@ export default class GameOver extends Phaser.Scene {
         //     });
         // }
 
-        // 버튼 공통 설정
-        const buttonWidth = 400;
-        const buttonHeight = 300;
-        const buttonY = height * 0.65 - buttonHeight / 2;
+        this.add.dom(centerX, height * 0.65+30).createFromHTML(`
+            <style>
+                .button-container {
+                    display: flex;
+                    justify-content: center;
+                    gap: 100px;
+                }
 
-        // [1] 나가기 버튼
-        const exitX = centerX - width * 0.2 - buttonWidth / 2;
-        const exitBg = this.add.graphics();
-        exitBg.fillStyle(boxColor, boxAlpha);
-        exitBg.fillRoundedRect(exitX, buttonY, buttonWidth, buttonHeight, cornerRadius);
-        exitBg.setInteractive(new Phaser.Geom.Rectangle(exitX, buttonY, buttonWidth, buttonHeight), Phaser.Geom.Rectangle.Contains);
+                .game-button {
+                    width: 350px;
+                    height: 390px;
+                    background-color: rgba(216, 176, 247, 0.6);
+                    border-radius: 30px;
+                    font-size: 50px;
+                    font-family: Arial, sans-serif;
+                    font-weight: bold;
+                    color: white;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+                    transition: transform 0.2s ease, box-shadow 0.2s ease;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                }
 
-        const exitText = this.add.text(exitX + buttonWidth / 2, buttonY + buttonHeight / 2, '나가기', {
-            fontSize: '70px',
-            fontFamily: 'Arial',
-            color: '#ffffff',
-            fontStyle: 'bold'
-        }).setOrigin(0.5);
+                .game-button:hover {
+                    transform: translateY(5px);
+                    box-shadow: 0 8px 20px rgba(255,255,255,0.3);
+                }
+            </style>
 
-        exitBg.on('pointerdown', () => this.scene.start('Home'))
-            .on('pointerover', () => {
-                this.tweens.add({ targets: [exitBg, exitText], y: '+=10', duration: 100 });
-            })
-            .on('pointerout', () => {
-                this.tweens.add({ targets: [exitBg, exitText], y: '-=10', duration: 100 });
-            });
+            <div class="button-container">
+                <div id="exit-btn" class="game-button">나가기</div>
+                <div id="restart-btn" class="game-button">재시작</div>
+            </div>
+        `);
 
-        // [2] 재시작 버튼
-        const restartX = centerX + width * 0.2 - buttonWidth / 2;
-        const restartBg = this.add.graphics();
-        restartBg.fillStyle(boxColor, boxAlpha);
-        restartBg.fillRoundedRect(restartX, buttonY, buttonWidth, buttonHeight, cornerRadius);
-        restartBg.setInteractive(new Phaser.Geom.Rectangle(restartX, buttonY, buttonWidth, buttonHeight), Phaser.Geom.Rectangle.Contains);
+        this.time.delayedCall(0, () => {
+            const exitBtn = document.getElementById('exit-btn');
+            const restartBtn = document.getElementById('restart-btn');
 
-        const restartText = this.add.text(restartX + buttonWidth / 2, buttonY + buttonHeight / 2, '재시작', {
-            fontSize: '70px',
-            fontFamily: 'Arial',
-            color: '#ffffff',
-            fontStyle: 'bold'
-        }).setOrigin(0.5);
+            if (exitBtn) {
+                exitBtn.addEventListener('click', () => {
+                    this.scene.start('Start');
+                });
+            }
 
-        restartBg.on('pointerdown', () => this.scene.start('RankBoard'))
-            .on('pointerover', () => {
-                this.tweens.add({ targets: [restartBg, restartText], y: '+=10', duration: 100 });
-            })
-            .on('pointerout', () => {
-                this.tweens.add({ targets: [restartBg, restartText], y: '-=10', duration: 100 });
-            });
+            if (restartBtn) {
+                restartBtn.addEventListener('click', () => {
+                    this.scene.start('Home'); 
+                });
+            }
+        });
+
+
     }
 }

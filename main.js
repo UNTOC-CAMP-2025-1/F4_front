@@ -11,13 +11,14 @@ import MyInfo from './scenes/MyInfo.js';
 import MyScore from './scenes/MyScore.js';
 import ProfileChange from './scenes/ProfileChange.js';
 import RankBoard from './scenes/RankBoard.js';
+import GamePage from './scenes/GamePage.js';
 
 const config = {
     type: Phaser.AUTO,
     width: window.innerWidth,
     height: window.innerHeight,
     parent: 'game-container',
-    scene: [Start, Home, LoginScreen, SignUp, ChangePW, NewPW, BestScore, CoinShop, GameOver, MyInfo, MyScore, ProfileChange, RankBoard],
+    scene: [Start, Home, LoginScreen, SignUp, ChangePW, NewPW, BestScore, CoinShop, GameOver, MyInfo, MyScore, ProfileChange, RankBoard, GamePage],
     dom: {
         createContainer: true
     }

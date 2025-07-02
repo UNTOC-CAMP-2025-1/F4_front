@@ -13,13 +13,32 @@ export default class SignUp extends Phaser.Scene {
             .setDisplaySize(this.cameras.main.width, this.cameras.main.height);
 
         //LOGIN 타이틀
-        this.add.dom(this.cameras.main.width / 2, this.cameras.main.height / 2 - 200).createFromHTML(`
+        this.add.dom(this.cameras.main.width / 2, this.cameras.main.height / 2 - 250).createFromHTML(`
             <div style="font-size: 55px; font-weight: bold; color: white;">
                 SIGN UP
             </div>
         `);
 
         this.add.dom(this.cameras.main.width / 2, this.cameras.main.height / 2).createFromHTML(`
+            <style>
+                #send-code-btn, #verify-code-btn {
+                padding: 10px 15px;
+                font-size: 14px;
+                border: none;
+                border-radius: 6px;
+                background-color: rgba(255, 255, 255, 0.4);
+                color: #444;
+                backdrop-filter: blur(5px);
+                cursor: pointer;
+                transition: all 0.25s ease;
+                }
+
+                #send-code-btn:hover, #verify-code-btn:hover {
+                background-color: rgba(255, 255, 255, 0.7);
+                transform: scale(1.05);
+                }
+            </style>
+
         <div style="display: flex; flex-direction: column; gap: 20px; align-items: center;">
 
             <!-- ID -->
@@ -30,10 +49,19 @@ export default class SignUp extends Phaser.Scene {
                     background-color: #ffe6f0; border: 1px solid #ccc; border-radius: 6px; color: black;" />
             </div>
 
-            <!-- Email -->
-            <div style="display: flex; align-items: center; gap: 20px;">
-            <label for="email" style="width: 120px; font-size: 20px; color: white; font-weight: bold; text-align: right;">E-mail</label>
+            <!-- Email + 인증코드 버튼 -->
+            <div style="display: flex; align-items: center; gap: 20px; transform: translateX(75px);">
+            <label for="email" style="width: 100px; font-size: 20px; font-weight: bold; color: white; text-align: right;">E-mail</label>
             <input id="email" type="email" placeholder="E-MAIL..." 
+                style="width: 300px; padding: 10px; font-size: 18px; background-color: #ffe6f0;
+                    border: 1px solid #ccc; border-radius: 6px; color: black;" />
+            <button id="send-code-btn">인증코드 받기</button>
+            </div>
+
+            <!-- 인증코드 입력칸-->
+            <div id="code-section" style="display: flex; align-items: center; gap: 20px; margin-top: 10px; transform: translateX(10px);">
+            <label for="code" style="width: 100px; font-size: 20px; color: white; font-weight: bold; text-align: right;">CODE</label>
+            <input id="code" type="text" placeholder="ENTER CODE..."
                 style="width: 300px; font-size: 18px; padding: 10px;
                     background-color: #ffe6f0; border: 1px solid #ccc; border-radius: 6px; color: black;" />
             </div>
@@ -61,8 +89,8 @@ export default class SignUp extends Phaser.Scene {
                 border: 2px solid white;
                 border-radius: 4px;
                 position: absolute;
-                right: -30px;
-                top: 90%;
+                right: 0px;
+                top: 93%;
                 transform: translateY(-50%);
                 visibility: hidden;
             ">
@@ -131,7 +159,7 @@ export default class SignUp extends Phaser.Scene {
 
 
         // 버튼들
-        this.add.dom(this.cameras.main.width / 2, this.cameras.main.height / 2 + 200).createFromHTML(`
+        this.add.dom(this.cameras.main.width / 2, this.cameras.main.height / 2 + 230).createFromHTML(`
             <style>
                 .fancy-button {
                     padding: 12px 30px;
@@ -159,7 +187,22 @@ export default class SignUp extends Phaser.Scene {
             </div>
         `);
 
+        const emailInput = document.getElementById('email');
+        const idInput = document.getElementById('id');
+        const sendCodeBtn = document.getElementById('send-code-btn');
 
+        sendCodeBtn.addEventListener('click', () => {
+            const id = idInput.value.trim();
+            const email = emailInput.value.trim();
+
+            if (!id || !email) {
+                alert('ID와 이메일을 모두 입력해주세요.');
+            } else {
+                alert('인증코드가 이메일로 전송되었습니다.');
+            }
+        });
+
+        
 
     }
 }
