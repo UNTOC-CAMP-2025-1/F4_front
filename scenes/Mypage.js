@@ -1,5 +1,5 @@
 // Style.js
-export default class Mypage extends Phaser.Scene {
+/*export default class Mypage extends Phaser.Scene {
     constructor() {
         super('Mypage');
     }
@@ -24,4 +24,4 @@ export default class Mypage extends Phaser.Scene {
             this.scene.start('Start');
         });
     }
-}
+}*/

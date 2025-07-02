@@ -5,7 +5,7 @@ export default class ProfileChange extends Phaser.Scene {
     }
 
     preload() {
-        console.log('[DEBUG] ProfileChange preload 진입');
+        //console.log('[DEBUG] ProfileChange preload 진입');
         this.load.image('background', 'assets/back.png');
         this.load.image('arrow', 'assets/arrow.png');
         this.load.image('profile1', 'assets/character.png');

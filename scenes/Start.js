@@ -94,7 +94,7 @@ export default class Start extends Phaser.Scene {
             });
 
             document.getElementById('mypageBtn').addEventListener('click', () => {
-                this.scene.start('Mypage');
+                this.scene.start('MyInfo');
             });
         });
         
