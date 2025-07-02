@@ -9,8 +9,8 @@ export default class ProfileChange extends Phaser.Scene {
         this.load.image('background', 'assets/back.png');
         this.load.image('arrow', 'assets/arrow.png');
         this.load.image('profile1', 'assets/character.png');
-        this.load.image('profile2', 'assets/profile2.png');
-        this.load.image('profile3', 'assets/profile3.png');
+        this.load.image('profile2', 'assets/character2.png');
+        this.load.image('profile3', 'assets/character3.png');
         this.load.image('profile4', 'assets/profile4.png');
         this.load.image('profile5', 'assets/profile5.png');
         this.load.image('profile6', 'assets/profile6.png');
@@ -22,13 +22,14 @@ export default class ProfileChange extends Phaser.Scene {
         const centerX = width / 2;
         const centerY = height / 2;
 
+        
         // 배경
-        this.add.image(0, 0, 'background').setOrigin(0).setDisplaySize(width, height);
+        this.add.image(0, 0, 'background').setOrigin(0).setDisplaySize(width, height).setDepth(0);
 
         // 현재 선택된 프로필
-        this.add.circle(300, centerY - 90, 120, 0xffc0cb);
-        this.currentProfile = this.add.image(300, centerY - 100, 'profile1')
-            .setDisplaySize(200, 200)
+        this.add.circle(320, centerY - 110, 200, 0xffc0cb);
+        this.currentProfile = this.add.image(320, centerY - 110, 'profile1')
+            .setDisplaySize(300, 300)
             .setOrigin(0.5);
 
         // 스크롤 박스
@@ -56,7 +57,7 @@ export default class ProfileChange extends Phaser.Scene {
         const profileKeys = ['profile1', 'profile2', 'profile3', 'profile4', 'profile5', 'profile6'];
         const scrollContainer = this.add.container(
             scrollBoxX - scrollBoxWidth / 2 + 150,
-            scrollBoxY - scrollBoxHeight / 2 +110
+            scrollBoxY - scrollBoxHeight / 2 + 110
         );
         scrollContainer.setMask(mask);
         const initialY = scrollContainer.y;
@@ -98,32 +99,41 @@ export default class ProfileChange extends Phaser.Scene {
             scrollContainer.y = Phaser.Math.Clamp(scrollContainer.y, minScrollY, maxScrollY);
         });
 
-        const applyButton = this.add.rectangle(300, height - 200, 240, 80, 0xffc0cb, 0.6)  // 버튼 크기를 더 크게 설정
-            .setStrokeStyle(2, 0xBBA6F2, 0.3)
+        // '적용하기' 버튼
+        const applyButton = this.add.rectangle(320, height - 200, 300, 100, 0xffc0cb, 0.8)
+            .setStrokeStyle(3, 0xBBA6F2, 0.5) 
             .setOrigin(0.5)
+            .setRadius(20)  // 둥글게 만들기
             .setInteractive({ useHandCursor: true })
             .on('pointerdown', () => {
-            console.log('적용하기 버튼 클릭됨');
+                console.log('적용하기 버튼 클릭됨');
                 // 버튼 클릭 시 처리할 로직을 추가할 수 있음
             });
 
-        // '적용하기' 텍스트 추가
-        this.add.text(300, height - 200, '적용하기', {
-            fontSize: '22px',  // 텍스트 크기 살짝 증가
-            fill: '#000000',
+        // 버튼 텍스트
+        this.add.text(320, height - 200, '적용하기', {
+            fontSize: '28px',
             fontStyle: 'bold',
+            fill: '#ffffff',
             align: 'center'
-        }).setOrigin(0.5, 0.5); // 정확한 중앙 위치 설정
+        }).setOrigin(0.5, 0.5).setDepth(10);
 
-
+        // 버튼에 마우스 오버 시 색상 변경 효과 추가
+        applyButton.on('pointerover', () => {
+            applyButton.setFill(0xFFB6C1); // 마우스를 올리면 색상 변경
+        }).on('pointerout', () => {
+            applyButton.setFill(0xffc0cb); // 마우스를 떼면 원래 색상으로 돌아옴
+        });
 
         // 뒤로가기 버튼
-        this.add.image(60, height - 60, 'arrow')
+        this.add.image(320, height - 200, 'arrow')
             .setOrigin(0.5)
             .setScale(0.5)
             .setInteractive({ useHandCursor: true })
             .on('pointerdown', () => {
                 this.scene.start('MyInfo');
             });
+
     }
 }
+
