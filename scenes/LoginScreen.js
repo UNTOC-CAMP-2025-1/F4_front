@@ -76,7 +76,7 @@ export default class LoginScreen extends Phaser.Scene {
 
             <div style="display: flex; flex-direction: column; align-items: center; gap: 15px;">
                 <button id="signup-btn" class="fancy-button">회원가입</button>
-                <button id="changepw-btn" class="fancy-button">비밀번호 찾기</button>
+                <button id="changepw-btn" class="fancy-button">비밀번호 변경</button>
             </div>
         `);
 
@@ -128,7 +128,6 @@ export default class LoginScreen extends Phaser.Scene {
                     const pw = document.getElementById('password');
                     if (id.value && pw.value) {
                         alert('로그인 시도됨');
-                        // TODO: 로그인 처리 후 씬 이동 등
                     } else {
                         alert('ID와 비밀번호를 모두 입력해주세요.');
                     }

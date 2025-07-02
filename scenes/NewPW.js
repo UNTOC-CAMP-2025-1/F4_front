@@ -42,7 +42,7 @@ export default class NewPW extends Phaser.Scene {
             <!-- 비밀번호 입력 -->
             <div style="display: flex; align-items: center; gap: 20px;">
                 <label for="pw" style="width: 130px; font-size: 20px; font-weight: bold; color: white;">PASSWORD</label>
-                <input id="pw" type="password" placeholder="PASSWORD..." 
+                <input id="pw" type="password" placeholder="PASSWORD..." maxlength="20" 
                     style="width: 300px; padding: 10px; font-size: 18px; background-color: #ffe6f0;
                         border: 1px solid #ccc; border-radius: 6px; color: black;" />
             </div>
@@ -50,7 +50,7 @@ export default class NewPW extends Phaser.Scene {
             <!-- 비밀번호 확인 -->
             <div style="display: flex; align-items: center; gap: 20px;">
                 <label for="confirm" style="width: 130px; font-size: 20px; font-weight: bold; color: white;">CONFIRM</label>
-                <input id="confirm" type="password" placeholder="PASSWORD..." 
+                <input id="confirm" type="password" placeholder="PASSWORD..." maxlength="20" 
                     style="width: 300px; padding: 10px; font-size: 18px; background-color: #ffe6f0;
                         border: 1px solid #ccc; border-radius: 6px; color: black;" />
                 <button id="verify-code-btn">확인</button>

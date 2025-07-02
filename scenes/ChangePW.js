@@ -37,7 +37,7 @@ export default class ChangePW extends Phaser.Scene {
             <!-- ID 입력 -->
             <div style="display: flex; align-items: center; gap: 20px;">
             <label for="id" style="width: 100px; font-size: 20px; font-weight: bold; color: white;">ID</label>
-            <input id="id" type="text" placeholder="ID..." 
+            <input id="id" type="text" placeholder="ID..." maxlength="20" 
                 style="width: 300px; padding: 10px; font-size: 18px; background-color: #ffe6f0;
                     border: 1px solid #ccc; border-radius: 6px; color: black;" />
             </div>

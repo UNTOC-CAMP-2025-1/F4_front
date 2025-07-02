@@ -25,7 +25,7 @@ export default class SignUp extends Phaser.Scene {
             <!-- ID -->
             <div style="display: flex; align-items: center; gap: 20px;">
             <label for="id" style="width: 120px; font-size: 20px; color: white; font-weight: bold; text-align: right;">ID</label>
-            <input id="id" type="text" placeholder="ID..." 
+            <input id="id" type="text" placeholder="ID..." maxlength="20" 
                 style="width: 300px; font-size: 18px; padding: 10px;
                     background-color: #ffe6f0; border: 1px solid #ccc; border-radius: 6px; color: black;" />
             </div>
@@ -41,7 +41,7 @@ export default class SignUp extends Phaser.Scene {
             <!-- Password -->
             <div style="display: flex; align-items: center; gap: 20px;">
             <label for="password" style="width: 120px; font-size: 20px; color: white; font-weight: bold; text-align: right;">PASSWORD</label>
-            <input id="password" type="password" placeholder="PASSWORD..." 
+            <input id="password" type="password" placeholder="PASSWORD..." maxlength="20" 
                 style="width: 300px; font-size: 18px; padding: 10px;
                     background-color: #ffe6f0; border: 1px solid #ccc; border-radius: 6px; color: black;" />
             </div>
@@ -49,7 +49,7 @@ export default class SignUp extends Phaser.Scene {
             <!-- Confirm Password -->
             <div style="display: flex; align-items: center; gap: 20px;">
             <label for="confirm" style="width: 120px; font-size: 20px; color: white; font-weight: bold; text-align: right;">CONFIRM</label>
-            <input id="confirm" type="password" placeholder="PASSWORD..." 
+            <input id="confirm" type="password" placeholder="PASSWORD..." maxlength="20" 
                 style="width: 300px; font-size: 18px; padding: 10px;
                     background-color: #ffe6f0; border: 1px solid #ccc; border-radius: 6px; color: black;" />
 
@@ -114,7 +114,7 @@ export default class SignUp extends Phaser.Scene {
                         window.alert('모든 항목을 올바르게 입력해주세요.');
                     }
                     console.log('가입하기 클릭됨');
-                    // TODO: 나중에 서버로 정보 전송
+    
                 });
             }
             
