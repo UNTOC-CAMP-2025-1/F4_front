@@ -129,7 +129,7 @@ export default class MyScore extends Phaser.Scene {
 
         // 클릭 시 BestScore로 이동
         honorContainer.on('pointerdown', () => {
-            this.scene.start('BestScore');
+            this.scene.start('EveryScore');
         });
 
 

@@ -87,6 +87,7 @@ export default class MyInfo extends Phaser.Scene {
                 color: '#ffffff'
             }).setOrigin(0.5).setDepth(2);
         });
+        
 
         // 돌아가기 버튼
         this.add.image(60, height - 60, 'arrow')

@@ -8,8 +8,7 @@ export default class ProfileChange extends Phaser.Scene {
         console.log('[DEBUG] ProfileChange preload 진입');
         this.load.image('background', 'assets/back.png');
         this.load.image('arrow', 'assets/arrow.png');
-        this.load.image('apply_btn', 'assets/apply_button.png');
-        this.load.image('profile1', 'assets/profile1.png');
+        this.load.image('profile1', 'assets/character.png');
         this.load.image('profile2', 'assets/profile2.png');
         this.load.image('profile3', 'assets/profile3.png');
         this.load.image('profile4', 'assets/profile4.png');
@@ -27,9 +26,9 @@ export default class ProfileChange extends Phaser.Scene {
         this.add.image(0, 0, 'background').setOrigin(0).setDisplaySize(width, height);
 
         // 현재 선택된 프로필
-        this.add.circle(300, centerY - 100, 120, 0xffc0cb);
+        this.add.circle(300, centerY - 90, 120, 0xffc0cb);
         this.currentProfile = this.add.image(300, centerY - 100, 'profile1')
-            .setDisplaySize(180, 180)
+            .setDisplaySize(200, 200)
             .setOrigin(0.5);
 
         // 스크롤 박스
@@ -76,7 +75,7 @@ export default class ProfileChange extends Phaser.Scene {
                 .setStrokeStyle(2, 0xBBA6F2, 0.3);
 
             const img = this.add.image(x, y, key)
-                .setDisplaySize(120, 120)
+                .setDisplaySize(150, 150)
                 .setInteractive({ useHandCursor: true })
                 .on('pointerdown', () => {
                     this.currentProfile.setTexture(key);
@@ -99,15 +98,24 @@ export default class ProfileChange extends Phaser.Scene {
             scrollContainer.y = Phaser.Math.Clamp(scrollContainer.y, minScrollY, maxScrollY);
         });
 
-        // 적용하기 버튼
-        this.add.image(300, height - 200, 'apply_btn')
+        const applyButton = this.add.rectangle(300, height - 200, 240, 80, 0xffc0cb, 0.6)  // 버튼 크기를 더 크게 설정
+            .setStrokeStyle(2, 0xBBA6F2, 0.3)
             .setOrigin(0.5)
-            .setScale(0.2)
             .setInteractive({ useHandCursor: true })
             .on('pointerdown', () => {
-                console.log('적용된 프로필:', this.currentProfile.texture.key);
-                // TODO: 저장 or 이동
+            console.log('적용하기 버튼 클릭됨');
+                // 버튼 클릭 시 처리할 로직을 추가할 수 있음
             });
+
+        // '적용하기' 텍스트 추가
+        this.add.text(300, height - 200, '적용하기', {
+            fontSize: '22px',  // 텍스트 크기 살짝 증가
+            fill: '#000000',
+            fontStyle: 'bold',
+            align: 'center'
+        }).setOrigin(0.5, 0.5); // 정확한 중앙 위치 설정
+
+
 
         // 뒤로가기 버튼
         this.add.image(60, height - 60, 'arrow')
