@@ -12,10 +12,13 @@ export default class MyInfo extends Phaser.Scene {
         this.load.image('arrow', 'assets/arrow.png');
     }
 
-    create() {
+    create(data) {
         const { width, height } = this.cameras.main;
         const centerX = width / 2;
         const centerY = height / 2;
+
+        const profileSrc = data?.profileSrc || localStorage.getItem('selectedProfile');
+
 
         // 배경
         this.add.image(0, 0, 'info_bg')
@@ -30,7 +33,7 @@ export default class MyInfo extends Phaser.Scene {
             width: 150px;
             height: 150px;
             border-radius: 50%;
-            background-color: #ffc0cb;
+            background-color:rgb(255, 229, 233);
             border: 4px solid #caa8f5;
             box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
             transition: transform 0.3s ease, border-color 0.3s ease;
@@ -40,9 +43,16 @@ export default class MyInfo extends Phaser.Scene {
             transform: scale(1.08);
             border-color: white;
             }
+
+            .profile-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            }
         </style>
 
-        <div class="profile-circle"></div>
+        <div class="profile-circle">${profileSrc ? `<img src="${profileSrc}" />` : ''}</div>
         `);
 
 

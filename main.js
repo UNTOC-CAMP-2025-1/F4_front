@@ -1,7 +1,6 @@
 import Start from './scenes/Start.js';
 import Home from './scenes/Home.js';
 import LoginScreen from './scenes/LoginScreen.js';
-import Mypage from './scenes/Mypage.js';
 import SignUp from './scenes/SignUp.js';
 import ChangePW from './scenes/ChangePW.js';
 import NewPW from './scenes/NewPW.js';
@@ -18,7 +17,7 @@ const config = {
     width: window.innerWidth,
     height: window.innerHeight,
     parent: 'game-container',
-    scene: [Start, Home, LoginScreen, Mypage, SignUp, ChangePW, NewPW, BestScore, CoinShop, GameOver, MyInfo, MyScore, ProfileChange, RankBoard],
+    scene: [Start, Home, LoginScreen, SignUp, ChangePW, NewPW, BestScore, CoinShop, GameOver, MyInfo, MyScore, ProfileChange, RankBoard],
     dom: {
         createContainer: true
     }
