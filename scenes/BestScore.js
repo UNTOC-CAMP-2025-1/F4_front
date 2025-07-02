@@ -16,121 +16,158 @@ export default class BestScore extends Phaser.Scene {
         // 배경
         this.add.image(0, 0, 'info_bg').setOrigin(0).setDisplaySize(width, height);
 
-        // 타이틀 (트로피 + SCORE + 트로피)
-        const trophyScale = 0.2;
-        const spacing = 70;
 
-        this.add.image(centerX - 140 - spacing, 100, 'trophy')
-            .setOrigin(0.5)
-            .setScale(trophyScale);
+        this.add.dom(centerX+400, 130).createFromHTML(`
+        <style>
+            .score-title-container {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 60px;
+            transform: translateX(-50%);
+            animation: floatUpDown 2.5s ease-in-out infinite;
+            }
 
-        this.add.text(centerX, 100, 'SCORE', {
-            fontSize: '60px',
-            fontFamily: 'Arial',
-            color: '#ffffff',
-            fontStyle: 'bold',
-        }).setOrigin(0.5);
+            .score-title-text {
+            font-size: 80px;
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+            color: white;
+            }
 
-        this.add.image(centerX + 140 + spacing, 100, 'trophy')
-            .setOrigin(0.5)
-            .setScale(trophyScale);
+            .trophy-img {
+            width: 150px;
+            height: 150px;
+            }
 
-        // 상단 바
-        this.add.rectangle(centerX, 250, 1000, 50, 0xDCCEFF, 0.8)
-            .setOrigin(0.5)
-            .setStrokeStyle(2, 0xBBA6F2, 0.3);
+            @keyframes floatUpDown {
+                0%, 100% {
+                transform: translateX(-50%) translateY(0px);
+                }
+                50% {
+                transform: translateX(-50%) translateY(-10px);
+                }
+            }
+        </style>
 
-        this.add.text(centerX - 350, 250, '최고의 지주(지렁이 주인이란 뜻) :', {
-            fontFamily: 'Arial',
-            fontSize: '32px',
-            color: '#ffffff',
-            align: 'center'
-        }).setOrigin(0.5);
+        <div class="score-title-container">
+            <img class="trophy-img" src="assets/trophy.png" />
+            <div class="score-title-text">명예의 전당</div>
+            <img class="trophy-img" src="assets/trophy.png" />
+        </div>
+        `);
 
-        // 스크롤 박스
-        const boxWidth = 1000;
-        const boxHeight = 320;
-        const boxX = centerX;
-        const boxY = 450;
+        this.add.dom(centerX+500, 250).createFromHTML(`
+        <style>
+            .top-score-bar {
+            width: 1000px;
+            height: 50px;
+            background-color: rgba(220, 206, 255, 0.8);
+            border: 2px solid rgba(187, 166, 242, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: left;
+            padding-left: 40px;
+            font-family: Arial, sans-serif;
+            font-size: 28px;
+            color: white;
+            border-radius: 6px;
+            box-sizing: border-box;
+            transform: translateX(-50%);
+            }
+        </style>
+        <div class="top-score-bar" id="best-score-bar">나의 최고 기록 : 계산 중...</div>
+        `);
 
-        this.add.rectangle(boxX, boxY, boxWidth, boxHeight, 0xDCCEFF, 0.8)
-            .setOrigin(0.5)
-            .setStrokeStyle(2, 0xBBA6F2, 0.3);
+        this.add.dom(centerX + 500, 450).createFromHTML(`
+        <style>
+            .scroll-container {
+            width: 1000px;
+            height: 320px;
+            background-color: rgba(220, 206, 255, 0.8);
+            border: 2px solid rgba(187, 166, 242, 0.3);
+            overflow-y: auto;
+            border-radius: 10px;
+            padding: 20px 10px;
+            box-sizing: border-box;
+            position: relative;
+            transform: translateX(-50%);
+            }
 
-        // 스크롤 컨테이너
-        const scrollX = boxX - boxWidth / 2;
-        const scrollY = boxY - boxHeight / 2;
-        const scrollContainer = this.add.container(scrollX, scrollY);
-        const initialY = scrollContainer.y;
+            .scroll-container::-webkit-scrollbar {
+            display: none;
+            }
 
-        // 더미 아이템
-        const itemHeight = 60;
-        const itemGap = 10;
-        const itemTotal = 20;
-        const topPadding = 60;
-        const bottomPadding = 20;
-        const totalHeight = topPadding + itemTotal * (itemHeight + itemGap) + bottomPadding;
+            .score-item {
+            width: 95%;
+            height: 60px;
+            background-color: white;
+            margin: 10px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-family: Arial, sans-serif;
+            border: 1px solid #999;
+            border-radius: 8px;
+            }
+        </style>
 
-        for (let i = 0; i < itemTotal; i++) {
-            const y = topPadding + i * (itemHeight + itemGap);
+        <div class="scroll-container">
+            ${Array.from({ length: 20 }, (_, i) => `<div class="score-item">기록 ${i + 1}: ${Math.floor(Math.random() * 10000)}점</div>`).join('')}
+        </div>
+        `);
 
-            const bg = this.add.rectangle(boxWidth / 2, y, boxWidth - 40, itemHeight, 0xffffff, 1)
-                .setOrigin(0.5)
-                .setStrokeStyle(1, 0x999999, 0.5);
+        this.time.delayedCall(0, () => {
+        const scoreItems = document.querySelectorAll('.score-item');
+        const bestScoreBar = document.getElementById('best-score-bar');
 
-            const text = this.add.text(boxWidth / 2, y, `기록 ${i + 1}: 12345점`, {
-                fontSize: '24px',
-                color: '#000000',
-                fontFamily: 'Arial'
-            }).setOrigin(0.5);
-
-            scrollContainer.add([bg, text]);
+        if (scoreItems.length > 0 && bestScoreBar) {
+            const scores = Array.from(scoreItems).map(item => {
+            const match = item.textContent.match(/(\d+)점/);
+            return match ? parseInt(match[1]) : 0;
+            });
+            const maxScore = Math.max(...scores);
+            bestScoreBar.innerText = `최고의 지주(지렁이 주인) : ${maxScore}점`;
         }
 
-        // 마스크 설정
-        const maskGraphics = this.make.graphics();
-        maskGraphics.fillStyle(0xffffff);
-        maskGraphics.fillRect(scrollX, scrollY, boxWidth, boxHeight);
-        const mask = maskGraphics.createGeometryMask();
-        scrollContainer.setMask(mask);
-
-        // 스크롤 범위
-        const minY = initialY - (totalHeight - boxHeight);
-        const maxY = initialY;
-
-        this.input.on('wheel', (pointer, gameObjects, deltaX, deltaY) => {
-            scrollContainer.y -= deltaY * 0.5;
-            scrollContainer.y = Phaser.Math.Clamp(scrollContainer.y, minY, maxY);
-        });
-
-        // ====== 명예의 전당 박스 추가 ======
-        const honorBoxWidth = 500;
-        const honorBoxHeight = 60;
-        const honorBoxRadius = 40;
-        const honorBoxY = height - 120;
-
-        // 배경 그래픽
-        const honorBoxGraphics = this.add.graphics();
-        honorBoxGraphics.fillStyle(0xBBA6F2, 0.6);
-        honorBoxGraphics.fillRoundedRect(-honorBoxWidth/2, -honorBoxHeight/2, honorBoxWidth, honorBoxHeight, honorBoxRadius-30);
-
-        // 텍스트
-        const honorText = this.add.text(0, 0, 'revenge?', {
-            fontSize: '30px',
-            fontFamily: 'Arial',
-            color: '#ffffff',
-            fontStyle: 'bold'
-        }).setOrigin(0.5);
-
-        // 컨테이너로 묶기
-        const honorContainer = this.add.container(centerX, honorBoxY, [honorBoxGraphics, honorText]);
-        honorContainer.setSize(honorBoxWidth, honorBoxHeight);
-        honorContainer.setInteractive(new Phaser.Geom.Rectangle(-honorBoxWidth/2, -honorBoxHeight/2, honorBoxWidth, honorBoxHeight), Phaser.Geom.Rectangle.Contains);
-
-        // 클릭 시 Home로 이동
-        honorContainer.on('pointerdown', () => {
+        const honorBtn = document.getElementById('honor-html-button');
+        if (honorBtn) {
+            honorBtn.addEventListener('click', () => {
             this.scene.start('Home');
+            });
+        }
         });
+
+        this.add.dom(centerX + 500, height - 120).createFromHTML(`
+        <style>
+            .honor-button {
+            width: 1000px;
+            height: 60px;
+            background-color: rgba(187, 166, 242, 0.6);
+            border-radius: 30px;
+            font-size: 30px;
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            transform: translateX(-50%);
+            }
+
+            .honor-button:hover {
+            transform: translate(-50%, 5px);
+            box-shadow: 0 4px 10px rgba(255, 255, 255, 0.3);
+            }
+        </style>
+
+        <div class="honor-button" id="honor-html-button">REVENGE?</div>
+        `);
+
 
 
         // 뒤로가기 버튼
@@ -141,5 +178,8 @@ export default class BestScore extends Phaser.Scene {
             .on('pointerdown', () => {
                 this.scene.start('MyInfo');
             });
+    
     }
 }
+
+

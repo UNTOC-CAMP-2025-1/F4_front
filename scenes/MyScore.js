@@ -17,7 +17,7 @@ export default class MyScore extends Phaser.Scene {
         this.add.image(0, 0, 'info_bg').setOrigin(0).setDisplaySize(width, height);
 
 
-        this.add.dom(centerX+360, 100).createFromHTML(`
+        this.add.dom(centerX+360, 130).createFromHTML(`
         <style>
             .score-title-container {
             width: 100%;
@@ -26,6 +26,7 @@ export default class MyScore extends Phaser.Scene {
             justify-content: center;
             gap: 60px;
             transform: translateX(-50%);
+            animation: floatUpDown 2.5s ease-in-out infinite;
             }
 
             .score-title-text {
@@ -39,6 +40,15 @@ export default class MyScore extends Phaser.Scene {
             width: 150px;
             height: 150px;
             }
+
+            @keyframes floatUpDown {
+                0%, 100% {
+                transform: translateX(-50%) translateY(0px);
+                }
+                50% {
+                transform: translateX(-50%) translateY(-10px);
+                }
+            }
         </style>
 
         <div class="score-title-container">
@@ -48,7 +58,7 @@ export default class MyScore extends Phaser.Scene {
         </div>
         `);
 
-        this.add.dom(centerX+360, 250).createFromHTML(`
+        this.add.dom(centerX+500, 250).createFromHTML(`
         <style>
             .top-score-bar {
             width: 1000px;
@@ -70,7 +80,7 @@ export default class MyScore extends Phaser.Scene {
         <div class="top-score-bar" id="best-score-bar">나의 최고 기록 : 계산 중...</div>
         `);
 
-        this.add.dom(centerX, 450).createFromHTML(`
+        this.add.dom(centerX + 500, 450).createFromHTML(`
         <style>
             .scroll-container {
             width: 1000px;
@@ -125,15 +135,15 @@ export default class MyScore extends Phaser.Scene {
         const honorBtn = document.getElementById('honor-html-button');
         if (honorBtn) {
             honorBtn.addEventListener('click', () => {
-            this.scene.start('EveryScore');
+            this.scene.start('BestScore');
             });
         }
         });
 
-        this.add.dom(centerX, height - 120).createFromHTML(`
+        this.add.dom(centerX + 500, height - 120).createFromHTML(`
         <style>
             .honor-button {
-            width: 500px;
+            width: 1000px;
             height: 60px;
             background-color: rgba(187, 166, 242, 0.6);
             border-radius: 30px;

@@ -140,7 +140,7 @@ export default class MyInfo extends Phaser.Scene {
             </div>
             <div class="card-button" id="coin-btn">
             <img src="assets/coin2.png" />
-            <span>내 코인</span>
+            <span>지렁이 스킨 샵</span>
             </div>
             <div class="card-button" id="pw-btn">
             <img src="assets/character.png" />

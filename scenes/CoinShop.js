@@ -17,77 +17,158 @@ export default class CoinShop extends Phaser.Scene {
         // 배경
         this.add.image(0, 0, 'shop_bg').setOrigin(0).setDisplaySize(width, height);
 
-        //상단 타이틀 (코인 2개 + COIN 텍스트)
-        const coinTitleY = 130;
-        const spacing = 150;
-        const coinScale = 0.15;
+        //타이틀 부분
+        this.add.dom(centerX + 300, 100).createFromHTML(`
+        <style>
+        .coin-title-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 60px;
+            transform: translateX(-50%);
+            animation: floatUpDown 2.5s ease-in-out infinite;
+        }
 
-        this.add.image(centerX - spacing-250, coinTitleY, 'shop_coin').setOrigin(0.5).setScale(coinScale);
-        this.add.text(centerX-250, coinTitleY, 'COIN', {
-            fontSize: '60px',
-            fontFamily: 'Arial',
-            color: '#ffffff',
-            fontStyle: 'bold'
-        }).setOrigin(0.5);
-        this.add.image(centerX + spacing-250, coinTitleY, 'shop_coin').setOrigin(0.5).setScale(coinScale);
+        .coin-title-text {
+            font-size: 70px;
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+            color: white;
+        }
 
-        // ===== 공통 스타일 =====
-        const boxColor = 0xd8b0f7;
-        const boxAlpha = 0.6;
-        const cornerRadius = 30;
+        @keyframes floatUpDown {
+            0%, 100% {
+            transform: translateX(-50%) translateY(0px);
+            }
+            50% {
+            transform: translateX(-50%) translateY(-10px);
+            }
+        }
+        </style>
 
-        // [1] 코인 잔액 박스 (둥글고 반투명)
-        const coinBoxX = centerX + 300 - 250;
-        const coinBoxY = 160;
-        const coinBoxWidth = 500;
-        const coinBoxHeight = 60;
+        <div class="coin-title-container">
+        <div class="coin-title-text">TINIWORM SHOP</div>
+        </div>
+        `);
 
-        const coinBox = this.add.graphics();
-        coinBox.fillStyle(boxColor, boxAlpha);
-        coinBox.fillRoundedRect(coinBoxX, coinBoxY-40, coinBoxWidth, coinBoxHeight, cornerRadius);
+        //코인 금액 보이는 칸
+        this.add.dom(centerX+550, 190).createFromHTML(`
+            <style>
+                .coin-box {
+                    width: 250px;
+                    height: 60px;
+                    background-color: rgba(216, 176, 247, 0.6);
+                    border-radius: 30px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 28px;
+                    font-family: Arial, sans-serif;
+                    color: white;
+                    transform: translateX(-50%);
+                }
+            </style>
+            <div class="coin-box">MY COIN: 0000</div>
+        `);
 
-        this.add.text(centerX + 180, coinBoxY + coinBoxHeight / 2-40, '내 코인: 0000', {
-            fontSize: '28px',
-            fontFamily: 'Arial',
-            color: '#ffffff'
-        }).setOrigin(0.5);
-
-        // [2-4] 상품 박스들
-        const boxY = 400;
-        const boxSpacing = 400;
-        const itemData = [
-            { x: centerX - boxSpacing, coin: 'coin2', label: '500 COIN' },
-            { x: centerX, coin: 'coin_2x', label: '1000 COIN' },
-            { x: centerX + boxSpacing, coin: 'coin_3x', label: '1500 COIN' }
+        // item 정보 배열
+        const itemList = [
+            { amount: 9999999, img: 'items/rosejun.png' },
+            { amount: 1000, img: 'items/skin1.png' },
+            { amount: 1500, img: 'items/skin2.png' },
+            { amount: 2000, img: 'items/skin3.png' },
+            { amount: 2500, img: 'items/skin4.png' },
+            { amount: 3000, img: 'items/skin5.png' },
+            // 원하는 만큼 추가 가능
         ];
 
-        itemData.forEach((item) => {
-            const cardWidth = 300;
-            const cardHeight = 400;
-            const cardX = item.x - cardWidth / 2;
-            const cardY = boxY + 30 - cardHeight / 2;
+        const itemHTML = itemList.map(item => `
+            <button class="shop-button" data-amount="${item.amount}">
+                <img src="${item.img}" />
+                <div class="label">${item.amount} COIN</div>
+            </button>
+        `).join('');
 
-            const card = this.add.graphics();
-            card.fillStyle(boxColor, boxAlpha);
-            card.fillRoundedRect(cardX, cardY, cardWidth, cardHeight, cornerRadius);
+        //item 보이는 부분
+        this.add.dom(centerX+550, 450).createFromHTML(`
+        <style>
+            .scroll-wrapper {
+            width: 1100px;
+            height: 400px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            white-space: nowrap;
+            padding-bottom: 20px;
+            transform: translateX(-50%);
+            }
 
-            this.add.image(item.x, boxY - 10, item.coin)
-                .setScale(0.2)
-                .setOrigin(0.5);
+            .scroll-wrapper::-webkit-scrollbar {
+            height: 14px;
+            }
 
-            this.add.text(item.x, boxY + 150, item.label, {
-                fontSize: '28px',
-                color: '#ffffff',
-                fontFamily: 'Arial',
-                fontStyle: 'bold'
-            }).setOrigin(0.5);
+            .scroll-wrapper::-webkit-scrollbar-thumb {
+            background-color: rgba(255, 255, 255, 0.96);
+            border-radius: 4px;
+            }
 
-            // 클릭 이벤트
-            card.setInteractive(new Phaser.Geom.Rectangle(cardX, cardY, cardWidth, cardHeight), Phaser.Geom.Rectangle.Contains)
-                .on('pointerdown', () => {
-                    console.log(`${item.label} 상품 클릭됨`);
+            .item-row {
+            display: flex;
+            gap: 30px;
+            padding: 10px;
+            }
+
+            .shop-button {
+            min-width: 250px;
+            height: 350px;
+            background-color: rgba(216, 176, 247, 0.6);
+            box-shadow: 0 0 11px rgba(0,0,0,0.2);
+            border-radius: 30px;
+            border: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            flex-shrink: 0;
+            }
+
+            .shop-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 16px rgba(255, 255, 255, 0.2);
+            }
+
+            .shop-button img {
+            width: 180px;
+            height: 200px;
+            margin-bottom: 15px;
+            }
+
+            .shop-button .label {
+            font-size: 28px;
+            font-weight: bold;
+            }
+        </style>
+
+        <div class="scroll-wrapper">
+            <div class="item-row">
+            ${itemHTML}
+            </div>
+        </div>
+        `);
+
+        this.time.delayedCall(0, () => {
+            document.querySelectorAll('.shop-button').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const amount = btn.dataset.amount;
+                    console.log(`${amount} COIN 상품 클릭됨`);
                 });
+            });
         });
+
+
 
         // 뒤로가기 버튼
         this.add.image(60, height - 60, 'arrow')
