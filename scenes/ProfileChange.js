@@ -24,6 +24,13 @@ export default class ProfileChange extends Phaser.Scene {
         const centerX = width / 2;
         const centerY = height / 2;
 
+        const profileMap = {
+        'assets/character.png': { profile_id: 1, profile_url: 'assets/character.png' },
+        'assets/character2.png': { profile_id: 2, profile_url: 'assets/character2.png' },
+        'assets/character3.png': { profile_id: 3, profile_url: 'assets/character3.png' },
+        'assets/character4.png': { profile_id: 4, profile_url: 'assets/character4.png' },
+        'assets/character5.png': { profile_id: 5, profile_url: 'assets/character5.png' }
+        };
         
         // 배경
         this.add.image(0, 0, 'background').setOrigin(0).setDisplaySize(width, height).setDepth(0);
@@ -98,11 +105,11 @@ export default class ProfileChange extends Phaser.Scene {
         </style>
 
         <div class="scroll-wrapper" id="profile-scroll-box">
-            <div class="profile-circle"><img src="assets/character.png" /></div>
-            <div class="profile-circle"><img src="assets/character2.png" /></div>
-            <div class="profile-circle"><img src="assets/character3.png" /></div>
-            <div class="profile-circle"><img src="assets/character4.png" /></div>
-            <div class="profile-circle"><img src="assets/character5.png" /></div>
+            <div class="profile-circle"><img id="ch1" src="assets/character.png" /></div>
+            <div class="profile-circle"><img id="ch2" src="assets/character2.png" /></div>
+            <div class="profile-circle"><img id="ch3: src="assets/character3.png" /></div>
+            <div class="profile-circle"><img id="ch4" src="assets/character4.png" /></div>
+            <div class="profile-circle"><img id="ch5" src="assets/character5.png" /></div>
             <div class="profile-circle"></div>
             <div class="profile-circle"></div>
             <div class="profile-circle"></div>
@@ -164,15 +171,53 @@ export default class ProfileChange extends Phaser.Scene {
 
         const applyHtmlBtn = document.getElementById('apply-html-btn');
         if (applyHtmlBtn) {
-            applyHtmlBtn.addEventListener('click', () => {
-                console.log('적용하기 버튼 클릭됨');
+            applyHtmlBtn.addEventListener('click', async () => {
                 if (this.selectedProfileSrc) {
-                    localStorage.setItem('selectedProfile', this.selectedProfileSrc);
+                    const selected = profileMap[this.selectedProfileSrc];
+                    if (!selected) {
+                        alert('선택된 프로필이 유효하지 않습니다.');
+                        return;
+                    }
+
+                    try {
+                        // 로그인한 사용자 정보 가져오기
+                        const userRes = await fetch('http://34.19.18.103:8000/user/me', {
+                            method: 'GET',
+                            credentials: 'include' // 쿠키 인증 정보 포함
+                        });
+
+                        if (!userRes.ok) {
+                            throw new Error('로그인 사용자 정보 가져오기 실패');
+                        }
+
+                        const userData = await userRes.json();
+                        const userEmail = userData.user_email;
+
+                        // 프로필 선택 API 호출
+                        const profileRes = await fetch('http://34.19.18.103:8000/user/profile/select', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                profile_id: selected.profile_id,
+                                profile_url: selected.profile_url,
+                                user_email: userEmail
+                            })
+                        });
+
+                        if (profileRes.ok) {
+                            alert('프로필 이미지가 변경되었습니다!');
+                            this.scene.start('MyInfo');
+                        } else {
+                            alert('프로필 이미지 변경 실패');
+                        }
+
+                    } catch (err) {
+                        console.error('오류 발생:', err);
+                        alert('서버와 통신 중 오류가 발생했습니다.');
+                    }
                 }
-
-                this.scene.start('MyInfo');
-
             });
+
         }
 
         const defaultHtmlBtn = document.getElementById('default-html-btn');
