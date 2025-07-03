@@ -123,13 +123,39 @@ export default class LoginScreen extends Phaser.Scene {
 
             const loginBtn = document.getElementById('login-btn');
             if (loginBtn) {
-                loginBtn.addEventListener('click', () => {
-                    const id = document.getElementById('username');
-                    const pw = document.getElementById('password');
-                    if (id.value && pw.value) {
-                        alert('로그인 시도됨');
-                    } else {
+                loginBtn.addEventListener('click', async () => {
+                    const id = document.getElementById('username').value.trim();
+                    const pw = document.getElementById('password').value.trim();
+
+                    if (!id || !pw) {
                         alert('ID와 비밀번호를 모두 입력해주세요.');
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch('http://34.19.18.103:8000/user/signup', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                user_name: id,
+                                password: pw
+                            })
+                        });
+
+                        if (response.ok) {
+                            const result = await response.text(); // 또는 JSON 파싱
+                            alert('로그인이 되었습니다!');
+                            // this.scene.start('GameScene'); // 로그인 성공 후 다음 씬으로 이동 (필요시)
+                        } else {
+                            const errorText = await response.text();
+                            alert('로그인 실패: ' + errorText);
+                        }
+
+                    } catch (err) {
+                        alert('서버 오류: 로그인 요청 실패');
+                        console.error(err);
                     }
                 });
             }
