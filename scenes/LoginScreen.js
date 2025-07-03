@@ -81,28 +81,31 @@ export default class LoginScreen extends Phaser.Scene {
         `);
 
         // 로그인 버튼 추가
-        this.add.dom(this.cameras.main.width / 2 + 280, this.cameras.main.height / 2 + 5).createFromHTML(`
-            <style>
-                .circle-login-btn {
-                    width: 50px;
-                    height: 50px;
-                    border-radius: 50%;
-                    border: none;
-                    background-color: rgba(255, 255, 255, 0.5);
-                    color: white;
-                    font-size: 24px;
-                    font-weight: bold;
-                    backdrop-filter: blur(5px);
-                    cursor: pointer;
-                    transition: all 0.3s ease;
-                }
-                .circle-login-btn:hover {
-                    background-color: rgba(255, 255, 255, 0.7);
-                    transform: scale(1.1); 
-                }
-            </style>
-            <button id="login-btn" class="circle-login-btn">✔</button>
-        `);
+        const loginButtonWrapper = this.add.dom(
+                this.cameras.main.width / 2 + 280,
+                this.cameras.main.height / 2 + 5
+            ).createFromHTML(`
+                <style>
+                    .circle-login-btn {
+                        width: 50px;
+                        height: 50px;
+                        border-radius: 50%;
+                        border: none;
+                        background-color: rgba(255, 255, 255, 0.5);
+                        color: white;
+                        font-size: 24px;
+                        font-weight: bold;
+                        backdrop-filter: blur(5px);
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                    }
+                    .circle-login-btn:hover {
+                        background-color: rgba(255, 255, 255, 0.7);
+                        transform: scale(1.1); 
+                    }
+                </style>
+                <button id="login-btn" class="circle-login-btn">✔</button>
+            `);
 
 
         this.time.delayedCall(0, () => {
@@ -120,10 +123,14 @@ export default class LoginScreen extends Phaser.Scene {
                     console.log('비밀번호 변경 버튼 클릭됨');                        this.scene.start('ChangePW');
                 });
             }
+        });
 
-            const loginBtn = document.getElementById('login-btn');
+        this.time.delayedCall(0, () => {
+            const loginBtn = loginButtonWrapper.node.querySelector('#login-btn');
             if (loginBtn) {
                 loginBtn.addEventListener('click', async () => {
+                    console.log('✔ 로그인 버튼 클릭됨');
+
                     const id = document.getElementById('username').value.trim();
                     const pw = document.getElementById('password').value.trim();
 
@@ -133,7 +140,7 @@ export default class LoginScreen extends Phaser.Scene {
                     }
 
                     try {
-                        const response = await fetch('http://34.19.18.103:8000/user/signup', {
+                        const response = await fetch('http://34.19.18.103:8000/user/login', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json'
@@ -145,22 +152,52 @@ export default class LoginScreen extends Phaser.Scene {
                         });
 
                         if (response.ok) {
-                            const result = await response.text(); // 또는 JSON 파싱
-                            alert('로그인이 되었습니다!');
-                            // this.scene.start('GameScene'); // 로그인 성공 후 다음 씬으로 이동 (필요시)
-                        } else {
-                            const errorText = await response.text();
-                            alert('로그인 실패: ' + errorText);
-                        }
+                            const data = await response.json();
+                            const token = data.access_token;
 
+                            localStorage.setItem('token', token);
+                            alert('로그인이 성공적으로 완료되었습니다.');
+                            console.log('access_token 저장 완료:', token);
+
+                            //인증 API 호출 예시 (user/me)
+                            try {
+                                const authRes = await fetch("http://34.19.18.103:8000/user/me", {
+                                    headers: {
+                                        Authorization: `Bearer ${token}`
+                                    }
+                                });
+
+                                if (authRes.ok) {
+                                    const userData = await authRes.json();
+                                    console.log("인증된 사용자 정보:", userData); 
+                                    this.scene.start('Start'); 
+
+                                } else if (authRes.status === 401) {
+                                    //토큰 만료 or 유효하지 않음
+                                    alert("세션이 만료되었습니다. 다시 로그인해주세요.");
+                                    localStorage.removeItem('token'); // 만료된 토큰 제거
+                                    this.scene.start('LoginScreen');  // 로그인 화면으로 이동
+                                } else {
+                                    console.error("인증 API 응답 실패", authRes.status);
+                                    alert("사용자 인증 정보 가져오기 실패");
+                                }
+                            } catch (authErr) {
+                                console.error("인증 API 호출 중 오류:", authErr);
+                                alert("인증 API 호출 실패");
+                            }
+                        } else if (response.status === 401) {
+                            alert('아이디나 비밀번호가 잘못되었습니다.');
+                        } else {
+                            alert('로그인 실패. 서버 오류');
+                        }
                     } catch (err) {
-                        alert('서버 오류: 로그인 요청 실패');
-                        console.error(err);
+                        alert('서버와 연결할 수 없습니다.');
+                        console.error('로그인 오류:', err);
                     }
                 });
+            } else {
+                console.warn('login-btn 찾기 실패');
             }
-
-
         });
 
 

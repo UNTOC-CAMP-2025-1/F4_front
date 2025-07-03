@@ -17,7 +17,13 @@ export default class MyInfo extends Phaser.Scene {
         const centerX = width / 2;
         const centerY = height / 2;
 
-        const profileSrc = data?.profileSrc || localStorage.getItem('selectedProfile');
+        const token = localStorage.getItem('token');
+        let profileSrc = data?.profileSrc || localStorage.getItem('selectedProfile');
+
+        // 로그인 안 했으면 프로필 이미지 제거
+        if (!token) {
+            profileSrc = '';
+        }
 
 
         // 배경
@@ -85,7 +91,12 @@ export default class MyInfo extends Phaser.Scene {
             const emojiBtn = document.querySelector('.emoji-btn');
             if (emojiBtn) {
                 emojiBtn.addEventListener('click', () => {
-                    this.scene.start('ProfileChange');
+                    const token = localStorage.getItem('token');
+                    if (token) {
+                        this.scene.start('ProfileChange');
+                    } else {
+                        alert("로그인 후 이용해주세요.");
+                    }
                 });
             }
         });

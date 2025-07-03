@@ -109,6 +109,8 @@ export default class ChangePW extends Phaser.Scene {
         `);
 
         this.time.delayedCall(0, () => {
+            const token = localStorage.getItem('token');  // 로그인 상태 판별용
+
             const sendBtn = document.getElementById('send-code-btn');
             const idInput = document.getElementById('id');
             const emailInput = document.getElementById('email');
@@ -118,41 +120,79 @@ export default class ChangePW extends Phaser.Scene {
             const cancelBtn = document.getElementById('cancel-btn');
             const verifyBtn = document.getElementById('verify-code-btn');
 
-            const TEMP_CODE = '1'; // 임시 인증코드
             let isVerified = false; // 인증 여부 확인용
 
             if (sendBtn) {
-                sendBtn.addEventListener('click', () => {
+                sendBtn.addEventListener('click', async () => {
                     const idVal = idInput.value.trim();
                     const emailVal = emailInput.value.trim();
 
                     if (!idVal || !emailVal) {
                         alert('ID와 E-mail을 모두 입력해주세요.');
                     } else {
-                        alert('인증코드가 이메일로 전송되었습니다.');
-                        codeSection.style.display = 'flex';
+                        try {
+                            const response = await fetch(`http://34.19.18.103:8000/user/send-auth-code?user_email=${emailVal}`, {
+                                method: 'POST'
+                            });
+
+                            if (response.ok) {
+                                alert('인증코드가 이메일로 전송되었습니다.');
+                                codeSection.style.display = 'flex';
+                            } else {
+                                alert('인증코드 요청 실패. 올바른 이메일인지 확인해주세요.');
+                            }
+                        } catch (err) {
+                            console.error('인증코드 요청 중 오류:', err);
+                            alert('서버와 연결할 수 없습니다.');
+                        }
                     }
                 });
             }
 
+
             if (verifyBtn) {
-                verifyBtn.addEventListener('click', () => {
-                    if (codeInput.value.trim() === TEMP_CODE) {
-                        alert('인증이 완료되었습니다.');
-                        isVerified = true;
-                    } else {
-                        alert('인증코드가 올바르지 않습니다.');
-                        isVerified = false;
+                verifyBtn.addEventListener('click', async () => {
+                    const emailVal = emailInput.value.trim();
+                    const codeVal = codeInput.value.trim();
+
+                    if (!emailVal || !codeVal) {
+                        alert('이메일과 인증코드를 모두 입력해주세요.');
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch(
+                            `http://34.19.18.103:8000/user/verify-auth-code?user_email=${emailVal}&code=${codeVal}`,
+                            {
+                                method: 'POST'
+                            }
+                        );
+
+                        if (response.ok) {
+                            alert('인증이 완료되었습니다.');
+                            isVerified = true;
+                        } else if (response.status === 400) {
+                            alert('잘못된 인증코드입니다.');
+                            isVerified = false;
+                        } else {
+                            alert('인증 실패. 다시 시도해주세요.');
+                            isVerified = false;
+                        }
+                    } catch (err) {
+                        console.error('인증 확인 중 오류:', err);
+                        alert('서버와 연결할 수 없습니다.');
                     }
                 });
             }
+
 
             if (submitBtn) {
             submitBtn.addEventListener('click', () => {
                 if (!isVerified) {
                     alert('인증을 먼저 완료해주세요.');
                 } else {
-                    this.scene.start('NewPW');
+                    const emailVal = emailInput.value.trim();
+                    this.scene.start('NewPW', {email: emailVal});
                 }
             });
         }
@@ -161,7 +201,11 @@ export default class ChangePW extends Phaser.Scene {
                 cancelBtn.addEventListener('click', () => {
                     const confirmed = window.confirm('비밀번호 변경을 취소하시겠습니까?');
                     if (confirmed) {
-                        this.scene.start('LoginScreen');
+                        if (token) {
+                            this.scene.start('Start');  // 로그인 상태면 Start로 이동
+                        } else {
+                            this.scene.start('LoginScreen');  // 비로그인 상태면 LoginScreen
+                        }
                     }
                 });
             }

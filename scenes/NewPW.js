@@ -7,7 +7,9 @@ export default class NewPW extends Phaser.Scene {
         this.load.image('NewPWback', 'assets/back.png');
     }
 
-    create() {
+    create(data) {
+        const emailFromPrev = data?.email || '';
+
         this.add.image(0, 0, 'NewPWback')
             .setOrigin(0)
             .setDisplaySize(this.cameras.main.width, this.cameras.main.height);
@@ -39,6 +41,14 @@ export default class NewPW extends Phaser.Scene {
                 새로운 비밀번호를 입력해주세요.
             </div>
 
+            <!-- 이메일 입력 -->
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <label for="email" style="width: 130px; font-size: 20px; font-weight: bold; color: white;">EMAIL</label>
+                <input id="email" type="text" placeholder="EMAIL..." value="${emailFromPrev}"
+                    style="width: 300px; padding: 10px; font-size: 18px; background-color: #ffe6f0;
+                        border: 1px solid #ccc; border-radius: 6px; color: black;" />
+            </div>
+
             <!-- 비밀번호 입력 -->
             <div style="display: flex; align-items: center; gap: 20px;">
                 <label for="pw" style="width: 130px; font-size: 20px; font-weight: bold; color: white;">PASSWORD</label>
@@ -64,19 +74,39 @@ export default class NewPW extends Phaser.Scene {
             const confirmInput = document.getElementById('confirm');
             const verifyBtn = document.getElementById('verify-code-btn');
             const cancelBtn = document.getElementById('cancel-btn');
+            const emailInput = document.getElementById('email');
+
+
 
             if (verifyBtn) {
-                verifyBtn.addEventListener('click', () => {
+                verifyBtn.addEventListener('click', async () => {
                     const pw = pwInput.value.trim();
                     const confirm = confirmInput.value.trim();
+                    const email = emailInput.value.trim();
 
-                    if (!pw || !confirm) {
+                    if (!pw || !confirm || !email) {
                         alert('새로운 비밀번호를 입력해주세요.');
-                    } else if (pw === confirm) {
-                        alert('비밀번호가 변경되었습니다.');
-                        this.scene.start('LoginScreen');
-                    } else {
+                    } else if (pw !== confirm) {
                         alert('새로운 비밀번호가 일치하지 않습니다.');
+                    } else {
+                        try {
+                            const response = await fetch(
+                                `http://34.19.18.103:8000/user/reset-password?user_email=${email}&new_password=${pw}`,
+                                {
+                                    method: 'POST'
+                                }
+                            );
+
+                            if (response.ok) {
+                                alert('비밀번호가 변경되었습니다.');
+                                this.scene.start('LoginScreen');
+                            } else {
+                                alert('비밀번호 변경에 실패했습니다.');
+                            }
+                        } catch (err) {
+                            console.error('비밀번호 변경 요청 실패:', err);
+                            alert('서버와 연결할 수 없습니다.');
+                        }
                     }
                 });
             }
