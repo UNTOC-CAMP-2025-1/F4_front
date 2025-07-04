@@ -131,7 +131,7 @@ export default class ChangePW extends Phaser.Scene {
                         alert('ID와 E-mail을 모두 입력해주세요.');
                     } else {
                         try {
-                            const response = await fetch(`http://34.19.18.103:8000/user/send-auth-code?user_email=${emailVal}`, {
+                            const response = await fetch(`http://34.169.165.241:8000/user/send-auth-code?user_email=${emailVal}`, {
                                 method: 'POST'
                             });
 
@@ -162,7 +162,7 @@ export default class ChangePW extends Phaser.Scene {
 
                     try {
                         const response = await fetch(
-                            `http://34.19.18.103:8000/user/verify-auth-code?user_email=${emailVal}&code=${codeVal}`,
+                            `http://34.169.165.241:8000/user/verify-auth-code?user_email=${emailVal}&code=${codeVal}`,
                             {
                                 method: 'POST'
                             }

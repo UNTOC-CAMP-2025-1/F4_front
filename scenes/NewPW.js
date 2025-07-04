@@ -91,7 +91,7 @@ export default class NewPW extends Phaser.Scene {
                     } else {
                         try {
                             const response = await fetch(
-                                `http://34.19.18.103:8000/user/reset-password?user_email=${email}&new_password=${pw}`,
+                                `http://34.169.165.241:8000/user/reset-password?user_email=${email}&new_password=${pw}`,
                                 {
                                     method: 'POST'
                                 }

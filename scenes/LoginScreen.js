@@ -120,7 +120,8 @@ export default class LoginScreen extends Phaser.Scene {
             const changePwButton = document.getElementById('changepw-btn');
             if (changePwButton) {
                 changePwButton.addEventListener('click', () => {
-                    console.log('비밀번호 변경 버튼 클릭됨');                        this.scene.start('ChangePW');
+                    console.log('비밀번호 변경 버튼 클릭됨');
+                    this.scene.start('ChangePW');
                 });
             }
         });
@@ -140,7 +141,7 @@ export default class LoginScreen extends Phaser.Scene {
                     }
 
                     try {
-                        const response = await fetch('http://34.19.18.103:8000/user/login', {
+                        const response = await fetch('http://34.169.165.241:8000/user/login', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json'
@@ -161,7 +162,7 @@ export default class LoginScreen extends Phaser.Scene {
 
                             //인증 API 호출 예시 (user/me)
                             try {
-                                const authRes = await fetch("http://34.19.18.103:8000/user/me", {
+                                const authRes = await fetch("http://34.169.165.241:8000/user/me", {
                                     headers: {
                                         Authorization: `Bearer ${token}`
                                     }

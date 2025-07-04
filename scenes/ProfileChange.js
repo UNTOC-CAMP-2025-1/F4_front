@@ -181,7 +181,7 @@ export default class ProfileChange extends Phaser.Scene {
 
                     try {
                         // 로그인한 사용자 정보 가져오기
-                        const userRes = await fetch('http://34.19.18.103:8000/user/me', {
+                        const userRes = await fetch('http://34.169.165.241:8000/user/me', {
                             method: 'GET',
                             credentials: 'include' // 쿠키 인증 정보 포함
                         });
@@ -194,7 +194,7 @@ export default class ProfileChange extends Phaser.Scene {
                         const userEmail = userData.user_email;
 
                         // 프로필 선택 API 호출
-                        const profileRes = await fetch('http://34.19.18.103:8000/user/profile/select', {
+                        const profileRes = await fetch('http://34.169.165.241:8000/user/profile/select', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({

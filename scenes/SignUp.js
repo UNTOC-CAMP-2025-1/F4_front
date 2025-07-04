@@ -185,7 +185,7 @@ export default class SignUp extends Phaser.Scene {
                     }
 
                     try {
-                        const signupResponse = await fetch('http://34.19.18.103:8000/user/signup', {
+                        const signupResponse = await fetch('http://34.169.165.241:8000/user/signup', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json'
@@ -248,7 +248,7 @@ export default class SignUp extends Phaser.Scene {
             }
 
             try {
-                const response = await fetch(`http://34.19.18.103:8000/user/send-auth-code?user_email=${email}`, {
+                const response = await fetch(`http://34.169.165.241:8000/user/send-auth-code?user_email=${email}`, {
                     method: 'POST'
                 });
 
@@ -277,7 +277,7 @@ export default class SignUp extends Phaser.Scene {
             }
 
             try {
-                const response = await fetch(`http://34.19.18.103:8000/user/verify-auth-code?user_email=${email}&code=${code}`, {
+                const response = await fetch(`http://34.169.165.241:8000/user/verify-auth-code?user_email=${email}&code=${code}`, {
                     method: 'POST'
                 });
 
