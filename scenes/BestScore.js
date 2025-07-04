@@ -1,6 +1,6 @@
-export default class MyScore extends Phaser.Scene {
+export default class BestScore extends Phaser.Scene {
     constructor() {
-        super('MyScore');
+        super('BestScore');
     }
 
     preload() {
@@ -17,7 +17,7 @@ export default class MyScore extends Phaser.Scene {
         this.add.image(0, 0, 'info_bg').setOrigin(0).setDisplaySize(width, height);
 
 
-        this.add.dom(centerX+360, 130).createFromHTML(`
+        this.add.dom(centerX+400, 130).createFromHTML(`
         <style>
             .score-title-container {
             width: 100%;
@@ -53,7 +53,7 @@ export default class MyScore extends Phaser.Scene {
 
         <div class="score-title-container">
             <img class="trophy-img" src="assets/trophy.png" />
-            <div class="score-title-text">SCORE</div>
+            <div class="score-title-text">명예의 전당</div>
             <img class="trophy-img" src="assets/trophy.png" />
         </div>
         `);
@@ -129,13 +129,13 @@ export default class MyScore extends Phaser.Scene {
             return match ? parseInt(match[1]) : 0;
             });
             const maxScore = Math.max(...scores);
-            bestScoreBar.innerText = `나의 최고 기록 : ${maxScore}점`;
+            bestScoreBar.innerText = `최고의 지주(지렁이 주인) : ${maxScore}점`;
         }
 
         const honorBtn = document.getElementById('honor-html-button');
         if (honorBtn) {
             honorBtn.addEventListener('click', () => {
-            this.scene.start('BestScore');
+            this.scene.start('Home');
             });
         }
         });
@@ -165,7 +165,7 @@ export default class MyScore extends Phaser.Scene {
             }
         </style>
 
-        <div class="honor-button" id="honor-html-button">명예의 전당</div>
+        <div class="honor-button" id="honor-html-button">REVENGE?</div>
         `);
 
 
@@ -181,3 +181,5 @@ export default class MyScore extends Phaser.Scene {
     
     }
 }
+
+

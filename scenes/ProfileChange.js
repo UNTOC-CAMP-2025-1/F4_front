@@ -5,135 +5,246 @@ export default class ProfileChange extends Phaser.Scene {
     }
 
     preload() {
-        console.log('[DEBUG] ProfileChange preload 진입');
         this.load.image('background', 'assets/back.png');
         this.load.image('arrow', 'assets/arrow.png');
         this.load.image('profile1', 'assets/character.png');
         this.load.image('profile2', 'assets/character2.png');
         this.load.image('profile3', 'assets/character3.png');
-        this.load.image('profile4', 'assets/profile4.png');
-        this.load.image('profile5', 'assets/profile5.png');
-        this.load.image('profile6', 'assets/profile6.png');
+        this.load.image('profile4', 'assets/character4.png');
+        this.load.image('profile5', 'assets/character55.png');
+        
     }
 
     create() {
-        console.log('[DEBUG] ProfileChange create 진입');
+
+        const savedProfile = localStorage.getItem('selectedProfile');
+        this.selectedProfileSrc = savedProfile || null;
+
         const { width, height } = this.cameras.main;
         const centerX = width / 2;
         const centerY = height / 2;
 
+        const profileMap = {
+        'assets/character.png': { profile_id: 1, profile_url: 'assets/character.png' },
+        'assets/character2.png': { profile_id: 2, profile_url: 'assets/character2.png' },
+        'assets/character3.png': { profile_id: 3, profile_url: 'assets/character3.png' },
+        'assets/character4.png': { profile_id: 4, profile_url: 'assets/character4.png' },
+        'assets/character5.png': { profile_id: 5, profile_url: 'assets/character5.png' }
+        };
         
         // 배경
         this.add.image(0, 0, 'background').setOrigin(0).setDisplaySize(width, height).setDepth(0);
 
-        // 현재 선택된 프로필
-        this.add.circle(320, centerY - 110, 200, 0xffc0cb);
-        this.currentProfile = this.add.image(320, centerY - 110, 'profile1')
-            .setDisplaySize(300, 300)
-            .setOrigin(0.5);
+        this.add.dom(320, centerY - 110).createFromHTML(`
+        <style>
+            .profile-circle-large {
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background-color:rgb(252, 227, 231);
+            border: 4px solid white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            }
 
-        // 스크롤 박스
-        const scrollBoxWidth = 500;
-        const scrollBoxHeight = 580;
-        const scrollBoxX = centerX + 180;
-        const scrollBoxY = centerY - 50;
+            .profile-circle-large img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            }
+        </style>
+        <div class="profile-circle-large" id="main-profile-display">${this.selectedProfileSrc ? `<img src="${this.selectedProfileSrc}" />` : ''}</div>
+        `);
 
-        const scrollBox = this.add.rectangle(scrollBoxX, scrollBoxY, scrollBoxWidth, scrollBoxHeight, 0xDCCEFF, 0.4)
-            .setStrokeStyle(2, 0xBBA6F2, 0.3)
-            .setOrigin(0.5);
 
-        // 마스크 설정
-        const maskGraphics = this.make.graphics({ x: 0, y: 0, add: false });
-        maskGraphics.fillStyle(0xffffff);
-        maskGraphics.fillRect(
-            scrollBoxX - scrollBoxWidth / 2,
-            scrollBoxY - scrollBoxHeight / 2,
-            scrollBoxWidth,
-            scrollBoxHeight
-        );
-        const mask = maskGraphics.createGeometryMask();
+        this.add.dom(centerX + 300, centerY).createFromHTML(`
+        <style>
+            .scroll-wrapper {
+            width: 550px;
+            height: 580px;
+            background-color: rgba(220, 206, 255, 0.4);
+            border: 2px solid rgba(187, 166, 242, 0.3);
+            overflow-y: auto;
+            padding: 20px 10px;
+            box-sizing: border-box;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            row-gap: 30px;
+            column-gap: 20px;
+            }
 
-        // 스크롤 컨테이너
-        const profileKeys = ['profile1', 'profile2', 'profile3', 'profile4', 'profile5', 'profile6'];
-        const scrollContainer = this.add.container(
-            scrollBoxX - scrollBoxWidth / 2 + 150,
-            scrollBoxY - scrollBoxHeight / 2 + 110
-        );
-        scrollContainer.setMask(mask);
-        const initialY = scrollContainer.y;
+            .profile-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background-color: #dccfff;
+            border: 2px solid #bba6f2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+            }
 
-        const columns = 2;
-        const spacingX = 200;
-        const spacingY = 200;
+            .profile-circle:hover {
+            transform: scale(1.07);
+            border-color: white;
+            }
 
-        profileKeys.forEach((key, index) => {
-            const row = Math.floor(index / columns);
-            const col = index % columns;
-            const x = col * spacingX;
-            const y = row * spacingY;
+            .profile-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            }
+        </style>
 
-            const bg = this.add.circle(x, y, 90, 0xDCCEFF, 0.9)
-                .setStrokeStyle(2, 0xBBA6F2, 0.3);
+        <div class="scroll-wrapper" id="profile-scroll-box">
+            <div class="profile-circle"><img id="ch1" src="assets/character.png" /></div>
+            <div class="profile-circle"><img id="ch2" src="assets/character2.png" /></div>
+            <div class="profile-circle"><img id="ch3: src="assets/character3.png" /></div>
+            <div class="profile-circle"><img id="ch4" src="assets/character4.png" /></div>
+            <div class="profile-circle"><img id="ch5" src="assets/character5.png" /></div>
+            <div class="profile-circle"></div>
+            <div class="profile-circle"></div>
+            <div class="profile-circle"></div>
+            <div class="profile-circle"></div>
+            <div class="profile-circle"></div>
+        </div>
+        `);
 
-            const img = this.add.image(x, y, key)
-                .setDisplaySize(150, 150)
-                .setInteractive({ useHandCursor: true })
-                .on('pointerdown', () => {
-                    this.currentProfile.setTexture(key);
+        this.time.delayedCall(0, () => {
+            const scrollCircles = document.querySelectorAll('.profile-circle img');
+            const mainProfile = document.getElementById('main-profile-display');
+
+            scrollCircles.forEach(img => {
+                img.addEventListener('click', () => {
+                    const selectedSrc = img.getAttribute('src');
+                    mainProfile.innerHTML = `<img src="${selectedSrc}" />`;
+                    this.selectedProfileSrc = selectedSrc; 
                 });
-
-            scrollContainer.add([bg, img]);
+            });
         });
 
-        // 스크롤 한계 계산
-        const totalRows = Math.ceil(profileKeys.length / columns);
-        const contentHeight = totalRows * spacingY;
-        const visibleHeight = scrollBoxHeight - 160;
+        this.add.dom(320, height - 200).createFromHTML(`
+        <style>
+            .button-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            }
 
-        const minScrollY = initialY - (contentHeight - visibleHeight);
-        const maxScrollY = initialY;
+            .transparent-btn {
+            width: 300px;
+            padding: 15px 0;
+            font-size: 24px;
+            font-weight: bold;
+            color: #fff;
+            background-color: rgba(255, 192, 203, 0.4); /* 연한 분홍, 투명 */
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 25px;
+            backdrop-filter: blur(5px);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: Arial, sans-serif;
+            }
 
-        // 휠 스크롤
-        this.input.on('wheel', (pointer, gameObjects, dx, dy) => {
-            scrollContainer.y -= dy * 0.3;
-            scrollContainer.y = Phaser.Math.Clamp(scrollContainer.y, minScrollY, maxScrollY);
-        });
+            .transparent-btn:hover {
+            background-color: rgba(255, 192, 203, 0.7);
+            border-color: white;
+            transform: scale(1.05);
+            }
+        </style>
 
-        // '적용하기' 버튼
-        const applyButton = this.add.rectangle(320, height - 200, 300, 100, 0xffc0cb, 0.8)
-            .setStrokeStyle(3, 0xBBA6F2, 0.5) 
-            .setOrigin(0.5)
-            .setRadius(20)  // 둥글게 만들기
-            .setInteractive({ useHandCursor: true })
-            .on('pointerdown', () => {
-                console.log('적용하기 버튼 클릭됨');
-                // 버튼 클릭 시 처리할 로직을 추가할 수 있음
+        <div class="button-container">
+            <button id="apply-html-btn" class="transparent-btn">적용하기</button>
+            <button id="default-html-btn" class="transparent-btn">기본이미지</button>
+        </div>
+        `);
+
+
+        const applyHtmlBtn = document.getElementById('apply-html-btn');
+        if (applyHtmlBtn) {
+            applyHtmlBtn.addEventListener('click', async () => {
+                if (this.selectedProfileSrc) {
+                    const selected = profileMap[this.selectedProfileSrc];
+                    if (!selected) {
+                        alert('선택된 프로필이 유효하지 않습니다.');
+                        return;
+                    }
+
+                    try {
+                        // 로그인한 사용자 정보 가져오기
+                        const userRes = await fetch('http://34.19.18.103:8000/user/me', {
+                            method: 'GET',
+                            credentials: 'include' // 쿠키 인증 정보 포함
+                        });
+
+                        if (!userRes.ok) {
+                            throw new Error('로그인 사용자 정보 가져오기 실패');
+                        }
+
+                        const userData = await userRes.json();
+                        const userEmail = userData.user_email;
+
+                        // 프로필 선택 API 호출
+                        const profileRes = await fetch('http://34.19.18.103:8000/user/profile/select', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                profile_id: selected.profile_id,
+                                profile_url: selected.profile_url,
+                                user_email: userEmail
+                            })
+                        });
+
+                        if (profileRes.ok) {
+                            alert('프로필 이미지가 변경되었습니다!');
+                            this.scene.start('MyInfo');
+                        } else {
+                            alert('프로필 이미지 변경 실패');
+                        }
+
+                    } catch (err) {
+                        console.error('오류 발생:', err);
+                        alert('서버와 통신 중 오류가 발생했습니다.');
+                    }
+                }
             });
 
-        // 버튼 텍스트
-        this.add.text(320, height - 200, '적용하기', {
-            fontSize: '28px',
-            fontStyle: 'bold',
-            fill: '#ffffff',
-            align: 'center'
-        }).setOrigin(0.5, 0.5).setDepth(10);
+        }
 
-        // 버튼에 마우스 오버 시 색상 변경 효과 추가
-        applyButton.on('pointerover', () => {
-            applyButton.setFill(0xFFB6C1); // 마우스를 올리면 색상 변경
-        }).on('pointerout', () => {
-            applyButton.setFill(0xffc0cb); // 마우스를 떼면 원래 색상으로 돌아옴
+        const defaultHtmlBtn = document.getElementById('default-html-btn');
+        if (defaultHtmlBtn) {
+        defaultHtmlBtn.addEventListener('click', () => {
+            console.log('기본이미지 버튼 클릭됨');
+
+            const mainProfile = document.getElementById('main-profile-display');
+            if (mainProfile) {
+                mainProfile.innerHTML = ''; 
+            }
+
+            this.selectedProfileSrc = null;
+
+            localStorage.removeItem('selectedProfile');
         });
+    }
 
-        // 뒤로가기 버튼
-        this.add.image(320, height - 200, 'arrow')
+        // 돌아가기 버튼
+        this.add.image(60, height - 60, 'arrow')
             .setOrigin(0.5)
             .setScale(0.5)
             .setInteractive({ useHandCursor: true })
             .on('pointerdown', () => {
+                console.log('Back Button Clicked');
                 this.scene.start('MyInfo');
             });
 
     }
 }
-

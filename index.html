@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <title>My Phaser Game</title>
-  <!-- Phaser를 CDN으로 불러오기 -->
-  <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
-  <script type="module" src="main.js"></script> <!-- main.js에서 씬을 import/export 하려면 module로 설정 -->
+  <script src="node_modules/phaser/dist/phaser.js"></script>
+  <script type="module" src="main.js"></script>
+   <!-- JS에서 씬을 import/export 하려면 module -->
   <style>
     body {
       margin: 0;
@@ -17,8 +17,9 @@
       height: 100vh;
     }
   </style>
+
 </head>
 <body>
-  <!-- Phaser가 게임 캔버스를 자동으로 생성합니다. -->
+  <!-- 여기에 아무것도 안 넣어도 됨. Phaser가 캔버스를 알아서 만듦 -->
 </body>
 </html>
