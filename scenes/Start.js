@@ -80,7 +80,7 @@ export default class Start extends Phaser.Scene {
             // 로그인 상태 확인
             if (token) {
                 try {
-                    const res = await fetch("http://34.19.18.103:8000/user/me", {
+                    const res = await fetch("http://34.169.165.241:8000/user/me", {
                         headers: {
                             Authorization: `Bearer ${token}`
                         }

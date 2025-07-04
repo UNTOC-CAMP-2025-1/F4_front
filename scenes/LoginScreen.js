@@ -170,7 +170,8 @@ export default class LoginScreen extends Phaser.Scene {
 
                                 if (authRes.ok) {
                                     const userData = await authRes.json();
-                                    console.log("인증된 사용자 정보:", userData); 
+                                    console.log("인증된 사용자 정보:", userData);
+                                    localStorage.setItem('currentUser', userData.user_email);
                                     this.scene.start('Start'); 
 
                                 } else if (authRes.status === 401) {

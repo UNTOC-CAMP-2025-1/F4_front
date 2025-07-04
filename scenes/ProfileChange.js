@@ -11,14 +11,20 @@ export default class ProfileChange extends Phaser.Scene {
         this.load.image('profile2', 'assets/character2.png');
         this.load.image('profile3', 'assets/character3.png');
         this.load.image('profile4', 'assets/character4.png');
-        this.load.image('profile5', 'assets/character55.png');
-        
+        this.load.image('profile5', 'assets/character5.png');
     }
 
     create() {
 
-        const savedProfile = localStorage.getItem('selectedProfile');
-        this.selectedProfileSrc = savedProfile || null;
+        const currentUser = localStorage.getItem('currentUser');
+        const path = window.location.pathname;
+
+        if (path.includes('mypage')) {
+            const savedProfile = currentUser ? localStorage.getItem(`profile_${currentUser}`) : null;
+            this.selectedProfileSrc = savedProfile || null;
+        } else {
+            this.selectedProfileSrc = null;
+        }
 
         const { width, height } = this.cameras.main;
         const centerX = width / 2;
@@ -105,11 +111,11 @@ export default class ProfileChange extends Phaser.Scene {
         </style>
 
         <div class="scroll-wrapper" id="profile-scroll-box">
-            <div class="profile-circle"><img id="ch1" src="assets/character.png" /></div>
-            <div class="profile-circle"><img id="ch2" src="assets/character2.png" /></div>
-            <div class="profile-circle"><img id="ch3: src="assets/character3.png" /></div>
-            <div class="profile-circle"><img id="ch4" src="assets/character4.png" /></div>
-            <div class="profile-circle"><img id="ch5" src="assets/character5.png" /></div>
+            <div class="profile-circle" data-profile-id="1"><img src="assets/character.png" /></div>
+            <div class="profile-circle" data-profile-id="2"><img src="assets/character2.png" /></div>
+            <div class="profile-circle" data-profile-id="3"><img src="assets/character3.png" /></div>
+            <div class="profile-circle" data-profile-id="4"><img src="assets/character4.png" /></div>
+            <div class="profile-circle" data-profile-id="5"><img src="assets/character5.png" /></div>
             <div class="profile-circle"></div>
             <div class="profile-circle"></div>
             <div class="profile-circle"></div>
@@ -179,62 +185,56 @@ export default class ProfileChange extends Phaser.Scene {
                         return;
                     }
 
+                    const token = localStorage.getItem('token');
+                    if (!token || !currentUser) {
+                        alert('로그인이 필요합니다.');
+                        return;
+                    }
+
                     try {
-                        // 로그인한 사용자 정보 가져오기
-                        const userRes = await fetch('http://34.169.165.241:8000/user/me', {
-                            method: 'GET',
-                            credentials: 'include' // 쿠키 인증 정보 포함
-                        });
-
-                        if (!userRes.ok) {
-                            throw new Error('로그인 사용자 정보 가져오기 실패');
-                        }
-
-                        const userData = await userRes.json();
-                        const userEmail = userData.user_email;
-
-                        // 프로필 선택 API 호출
+                        // 백엔드 저장
                         const profileRes = await fetch('http://34.169.165.241:8000/user/profile/select', {
                             method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                            },
                             body: JSON.stringify({
                                 profile_id: selected.profile_id,
-                                profile_url: selected.profile_url,
-                                user_email: userEmail
+                                profile_url: selected.profile_url
                             })
                         });
 
                         if (profileRes.ok) {
+                            localStorage.setItem(`profile_${currentUser}`, selected.profile_url);
                             alert('프로필 이미지가 변경되었습니다!');
                             this.scene.start('MyInfo');
                         } else {
-                            alert('프로필 이미지 변경 실패');
+                            alert('프로필 변경 실패!');
                         }
 
                     } catch (err) {
                         console.error('오류 발생:', err);
-                        alert('서버와 통신 중 오류가 발생했습니다.');
+                        alert('서버 오류');
                     }
                 }
             });
-
         }
 
-        const defaultHtmlBtn = document.getElementById('default-html-btn');
+
         if (defaultHtmlBtn) {
-        defaultHtmlBtn.addEventListener('click', () => {
-            console.log('기본이미지 버튼 클릭됨');
+            defaultHtmlBtn.addEventListener('click', () => {
+                const mainProfile = document.getElementById('main-profile-display');
+                if (mainProfile) {
+                    mainProfile.innerHTML = ''; 
+                }
 
-            const mainProfile = document.getElementById('main-profile-display');
-            if (mainProfile) {
-                mainProfile.innerHTML = ''; 
-            }
-
-            this.selectedProfileSrc = null;
-
-            localStorage.removeItem('selectedProfile');
-        });
-    }
+                this.selectedProfileSrc = null;
+                if (currentUser) {
+                    localStorage.removeItem(`profile_${currentUser}`);
+                }
+            });
+        }
 
         // 돌아가기 버튼
         this.add.image(60, height - 60, 'arrow')

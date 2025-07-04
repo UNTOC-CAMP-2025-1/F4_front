@@ -18,7 +18,8 @@ export default class MyInfo extends Phaser.Scene {
         const centerY = height / 2;
 
         const token = localStorage.getItem('token');
-        let profileSrc = data?.profileSrc || localStorage.getItem('selectedProfile');
+        const currentUser = localStorage.getItem('currentUser');
+        let profileSrc = currentUser ? localStorage.getItem(`profile_${currentUser}`) : null;
 
         // 로그인 안 했으면 프로필 이미지 제거
         if (!token) {
