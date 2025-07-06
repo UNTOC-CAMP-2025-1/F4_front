@@ -2,13 +2,11 @@ export default class BestScore extends Phaser.Scene {
     constructor() {
         super('BestScore');
     }
-
     preload() {
         this.load.image('info_bg', 'assets/back.png');
         this.load.image('arrow', 'assets/arrow.png');
         this.load.image('trophy', 'assets/trophy.png');
     }
-
     create() {
         const { width, height } = this.cameras.main;
         const centerX = width / 2;
@@ -16,8 +14,7 @@ export default class BestScore extends Phaser.Scene {
         // 배경
         this.add.image(0, 0, 'info_bg').setOrigin(0).setDisplaySize(width, height);
 
-
-        this.add.dom(centerX+400, 130).createFromHTML(`
+        this.add.dom(centerX+350, 130).createFromHTML(`
         <style>
             .score-title-container {
             width: 100%;
@@ -53,7 +50,7 @@ export default class BestScore extends Phaser.Scene {
 
         <div class="score-title-container">
             <img class="trophy-img" src="assets/trophy.png" />
-            <div class="score-title-text">명예의 전당</div>
+            <div class="score-title-text">TOP 3</div>
             <img class="trophy-img" src="assets/trophy.png" />
         </div>
         `);
@@ -114,31 +111,8 @@ export default class BestScore extends Phaser.Scene {
             }
         </style>
 
-        <div class="scroll-container">
-            ${Array.from({ length: 20 }, (_, i) => `<div class="score-item">기록 ${i + 1}: ${Math.floor(Math.random() * 10000)}점</div>`).join('')}
-        </div>
+        <div class="scroll-container"></div>
         `);
-
-        this.time.delayedCall(0, () => {
-        const scoreItems = document.querySelectorAll('.score-item');
-        const bestScoreBar = document.getElementById('best-score-bar');
-
-        if (scoreItems.length > 0 && bestScoreBar) {
-            const scores = Array.from(scoreItems).map(item => {
-            const match = item.textContent.match(/(\d+)점/);
-            return match ? parseInt(match[1]) : 0;
-            });
-            const maxScore = Math.max(...scores);
-            bestScoreBar.innerText = `최고의 지주(지렁이 주인) : ${maxScore}점`;
-        }
-
-        const honorBtn = document.getElementById('honor-html-button');
-        if (honorBtn) {
-            honorBtn.addEventListener('click', () => {
-            this.scene.start('Home');
-            });
-        }
-        });
 
         this.add.dom(centerX + 500, height - 120).createFromHTML(`
         <style>
@@ -169,6 +143,45 @@ export default class BestScore extends Phaser.Scene {
         `);
 
 
+        //점수 백엔드에서 불러오기 : top3
+        const fetchLeaderboard = async () => {
+            try {
+                const response = await fetch('http://34.169.165.241:8000/leader_board/top');
+                if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+
+                const data = await response.json(); // ← 유저 정보 배열
+                const scrollContainer = document.querySelector('.scroll-container');
+                scrollContainer.innerHTML = ''; // 기존 가짜 데이터 제거
+
+                data.forEach((entry, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'score-item';
+                    item.textContent = `${index + 1}위 - ${entry.user_name} : ${entry.user_score}점`;
+                    scrollContainer.appendChild(item);
+                });
+
+                const bestScoreBar = document.getElementById('best-score-bar');
+                if (bestScoreBar && data.length > 0) {
+                    bestScoreBar.innerText = `최고의 지주(지렁이 주인) : ${data[0].user_name} (${data[0].user_score}점)`;
+                }
+
+            } catch (error) {
+                console.error('리더보드 가져오기 실패:', error);
+                alert("서버에서 점수 정보를 불러오지 못했습니다.");
+            }
+        };
+
+        fetchLeaderboard();
+
+        //revenge 버튼 부분
+        this.time.delayedCall(0, () => {
+            const honorBtn = document.getElementById('honor-html-button');
+            if (honorBtn) {
+                honorBtn.addEventListener('click', () => {
+                    this.scene.start('Home');
+                });
+            }
+        });
 
         // 뒤로가기 버튼
         this.add.image(60, height - 60, 'arrow')

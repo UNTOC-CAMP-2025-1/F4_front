@@ -26,6 +26,76 @@ export default class MyInfo extends Phaser.Scene {
             profileSrc = '';
         }
 
+        const showAlertPopup = (title, message, onConfirm = null) => {
+            const popup = document.createElement('div');
+            popup.id = 'alert-popup';
+            popup.innerHTML = `
+                <style>
+                    #alert-popup {
+                        position: fixed;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        background-color: #fbefff;
+                        padding: 30px 50px;
+                        border-radius: 25px;
+                        font-family: Arial, sans-serif;
+                        text-align: center;
+                        z-index: 1000;
+                        box-shadow: 0 0 20px rgba(0,0,0,0.4);
+                    }
+
+                    #alert-popup h2 {
+                        font-size: 36px;
+                        font-weight: bold;
+                        color: #6b4c9a;
+                        margin-bottom: 10px;
+                    }
+
+                    #alert-popup p {
+                        font-size: 22px;
+                        margin: 20px 0;
+                        color: #444;
+                    }
+
+                    .btn-group {
+                        display: flex;
+                        justify-content: center;
+                        margin-top: 20px;
+                    }
+
+                    .confirm-btn {
+                        font-size: 20px;
+                        padding: 10px 24px;
+                        border-radius: 12px;
+                        cursor: pointer;
+                        font-weight: bold;
+                        background-color: #b493d6;
+                        color: white;
+                        border: none;
+                        transition: transform 0.2s ease, background-color 0.2s ease;
+                    }
+
+                    .confirm-btn:hover {
+                        transform: scale(1.08);
+                        background-color: #9f7bc7;
+                    }
+                </style>
+                <h2>${title}</h2>
+                <p>${message}</p>
+                <div class="btn-group">
+                    <button class="confirm-btn">확인</button>
+                </div>
+            `;
+
+            document.body.appendChild(popup);
+            popup.querySelector('.confirm-btn').addEventListener('click', () => {
+                popup.remove();
+                if (onConfirm) onConfirm();
+            });
+        };
+
+
 
         // 배경
         this.add.image(0, 0, 'info_bg')
@@ -96,7 +166,7 @@ export default class MyInfo extends Phaser.Scene {
                     if (token) {
                         this.scene.start('ProfileChange');
                     } else {
-                        alert("로그인 후 이용해주세요.");
+                        showAlertPopup("로그인 필요", "로그인 후 이용해주세요.");
                     }
                 });
             }
@@ -167,7 +237,14 @@ export default class MyInfo extends Phaser.Scene {
         const pwBtn = document.getElementById('pw-btn');
 
         if (scoreBtn) {
-            scoreBtn.addEventListener('click', () => this.scene.start('MyScore'));
+            scoreBtn.addEventListener('click', () => {
+                const token = localStorage.getItem('token');
+                if (token) {
+                    this.scene.start('MyScore');
+                } else {
+                    showAlertPopup("로그인 필요", "로그인 후 이용해주세요.");
+                }
+            });
         }
 
         if (coinBtn) {
