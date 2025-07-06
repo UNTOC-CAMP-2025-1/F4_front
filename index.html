@@ -1,25 +1,30 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <title>My Phaser Game</title>
+  <meta charset="UTF-8" />
+  <title>My Phaser + Slither Game</title>
+  <!-- 1) Phaser 전역 스크립트 로드 -->
   <script src="node_modules/phaser/dist/phaser.js"></script>
-  <script type="module" src="main.js"></script>
-   <!-- JS에서 씬을 import/export 하려면 module -->
+
   <style>
+    /* 캔버스를 브라우저 전체에 꽉 채우기 */
     body {
       margin: 0;
       padding: 0;
       overflow: hidden;
     }
+    /* main.js 의 config.parent: 'game-container' 와 매칭됩니다 */
     #game-container {
       width: 100vw;
       height: 100vh;
     }
   </style>
-
 </head>
 <body>
-  <!-- 여기에 아무것도 안 넣어도 됨. Phaser가 캔버스를 알아서 만듦 -->
+  <!-- 2) Phaser가 캔버스를 붙일 컨테이너 -->
+  <div id="game-container"></div>
+
+  <!-- 3) main.js 안에서 ES 모듈로 씬들을 import/export -->
+  <script type="module" src="./main.js"></script>
 </body>
 </html>
