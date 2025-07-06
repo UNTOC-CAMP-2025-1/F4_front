@@ -1,8 +1,8 @@
 // src/scenes/game.js
-import PlayerSnake from '../entities/PlayerSnake.js';
-import BotSnake    from '../entities/BotSnake.js';
-import Food        from '../entities/Food.js';
-import Util        from '../Util.js';
+import PlayerSnake from './entities/PlayerSnake.js';
+import BotSnake    from './entities/BotSnake.js';
+import Food        from './entities/Food.js';
+import Util        from './Util.js';
 
 export default class game extends Phaser.Scene {
   constructor() {

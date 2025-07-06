@@ -1,6 +1,6 @@
-export default class BestScore extends Phaser.Scene {
+export default class EveryScore extends Phaser.Scene {
     constructor() {
-        super('BestScore');
+        super('EveryScore');
     }
 
     preload() {
