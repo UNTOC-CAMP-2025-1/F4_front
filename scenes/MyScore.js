@@ -114,31 +114,52 @@ export default class MyScore extends Phaser.Scene {
             }
         </style>
 
-        <div class="scroll-container">
-            ${Array.from({ length: 20 }, (_, i) => `<div class="score-item">기록 ${i + 1}: ${Math.floor(Math.random() * 10000)}점</div>`).join('')}
-        </div>
+        <div class="scroll-container" id="score-scroll-container"></div>
         `);
 
-        this.time.delayedCall(0, () => {
-        const scoreItems = document.querySelectorAll('.score-item');
-        const bestScoreBar = document.getElementById('best-score-bar');
+        // 백엔드에서 점수 불러오기
+        const token = localStorage.getItem('token');
+        if (token) {
+            fetch('http://34.169.165.241:8000/game_session/my?sort_by=recent&domain=game_session', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/json'
+                }
+            })
+            .then(res => {
+                if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+                return res.json();
+            })
+            .then(data => {
+                const container = document.getElementById('score-scroll-container');
+                const bestScoreBar = document.getElementById('best-score-bar');
+                container.innerHTML = '';
 
-        if (scoreItems.length > 0 && bestScoreBar) {
-            const scores = Array.from(scoreItems).map(item => {
-            const match = item.textContent.match(/(\d+)점/);
-            return match ? parseInt(match[1]) : 0;
-            });
-            const maxScore = Math.max(...scores);
-            bestScoreBar.innerText = `나의 최고 기록 : ${maxScore}점`;
-        }
+                if (Array.isArray(data) && data.length > 0) {
+                    let maxScore = 0;
 
-        const honorBtn = document.getElementById('honor-html-button');
-        if (honorBtn) {
-            honorBtn.addEventListener('click', () => {
-            this.scene.start('BestScore');
+                    data.forEach((item, index) => {
+                        const score = item.user_score ?? 0;
+                        maxScore = Math.max(maxScore, score);
+
+                        const div = document.createElement('div');
+                        div.className = 'score-item';
+                        div.textContent = `${score}점`;
+                        container.appendChild(div);
+                    });
+
+                    bestScoreBar.innerText = `나의 최고 기록 : ${maxScore}점`;
+                } else {
+                    container.innerHTML = `<div class="score-item">기록이 없습니다.</div>`;
+                    bestScoreBar.innerText = '나의 최고 기록 : -';
+                }
+            })
+            .catch(err => {
+                console.error('게임 기록 로딩 실패:', err);
+                document.getElementById('score-scroll-container').innerHTML = `<div class="score-item">불러오는 데 실패했습니다.</div>`;
             });
         }
-        });
 
         this.add.dom(centerX + 500, height - 120).createFromHTML(`
         <style>
@@ -168,7 +189,14 @@ export default class MyScore extends Phaser.Scene {
         <div class="honor-button" id="honor-html-button">명예의 전당</div>
         `);
 
-
+        this.time.delayedCall(0, () => {
+            const honorBtn = document.getElementById('honor-html-button');
+            if (honorBtn) {
+                honorBtn.addEventListener('click', () => {
+                    this.scene.start('BestScore');
+                });
+            }
+        });
 
         // 뒤로가기 버튼
         this.add.image(60, height - 60, 'arrow')

@@ -8,6 +8,75 @@ export default class ChangePW extends Phaser.Scene {
     }
 
     create() {
+        const showAlertPopup = (title, message, onConfirm = null) => {
+            const popup = document.createElement('div');
+            popup.id = 'alert-popup';
+            popup.innerHTML = `
+                <style>
+                    #alert-popup {
+                        position: fixed;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        background-color: #fbefff;
+                        padding: 30px 50px;
+                        border-radius: 25px;
+                        font-family: Arial, sans-serif;
+                        text-align: center;
+                        z-index: 1000;
+                        box-shadow: 0 0 20px rgba(0,0,0,0.4);
+                    }
+
+                    #alert-popup h2 {
+                        font-size: 36px;
+                        font-weight: bold;
+                        color: #6b4c9a;
+                        margin-bottom: 10px;
+                    }
+
+                    #alert-popup p {
+                        font-size: 22px;
+                        margin: 20px 0;
+                        color: #444;
+                    }
+
+                    .btn-group {
+                        display: flex;
+                        justify-content: center;
+                        margin-top: 20px;
+                    }
+
+                    .confirm-btn {
+                        font-size: 20px;
+                        padding: 10px 24px;
+                        border-radius: 12px;
+                        cursor: pointer;
+                        font-weight: bold;
+                        background-color: #b493d6;
+                        color: white;
+                        border: none;
+                        transition: transform 0.2s ease, background-color 0.2s ease;
+                    }
+
+                    .confirm-btn:hover {
+                        transform: scale(1.08);
+                        background-color: #9f7bc7;
+                    }
+                </style>
+                <h2>${title}</h2>
+                <p>${message}</p>
+                <div class="btn-group">
+                    <button class="confirm-btn">확인</button>
+                </div>
+            `;
+
+            document.body.appendChild(popup);
+            popup.querySelector('.confirm-btn').addEventListener('click', () => {
+                popup.remove();
+                if (onConfirm) onConfirm();
+            });
+        };
+        
         this.add.image(0, 0, 'PWback')
             .setOrigin(0)
             .setDisplaySize(this.cameras.main.width, this.cameras.main.height);
@@ -128,7 +197,7 @@ export default class ChangePW extends Phaser.Scene {
                     const emailVal = emailInput.value.trim();
 
                     if (!idVal || !emailVal) {
-                        alert('ID와 E-mail을 모두 입력해주세요.');
+                        showAlertPopup(" ", "ID와 E-mail을 모두 입력해주세요.");
                     } else {
                         try {
                             const response = await fetch(`http://34.169.165.241:8000/user/send-auth-code?user_email=${emailVal}`, {
@@ -136,10 +205,10 @@ export default class ChangePW extends Phaser.Scene {
                             });
 
                             if (response.ok) {
-                                alert('인증코드가 이메일로 전송되었습니다.');
+                                showAlertPopup("CODE", "인증코드가 이메일로 전송되었습니다.");
                                 codeSection.style.display = 'flex';
                             } else {
-                                alert('인증코드 요청 실패. 올바른 이메일인지 확인해주세요.');
+                                showAlertPopup("CHECK", "인증코드 요청 실패. 올바른 이메일인지 확인해주세요.");
                             }
                         } catch (err) {
                             console.error('인증코드 요청 중 오류:', err);
@@ -156,7 +225,7 @@ export default class ChangePW extends Phaser.Scene {
                     const codeVal = codeInput.value.trim();
 
                     if (!emailVal || !codeVal) {
-                        alert('이메일과 인증코드를 모두 입력해주세요.');
+                        showAlertPopup(" ", "이메일과 인증코드를 모두 입력해주세요.");
                         return;
                     }
 
@@ -169,13 +238,13 @@ export default class ChangePW extends Phaser.Scene {
                         );
 
                         if (response.ok) {
-                            alert('인증이 완료되었습니다.');
+                            showAlertPopup("CODE", "인증이 완료되었습니다.");
                             isVerified = true;
                         } else if (response.status === 400) {
-                            alert('잘못된 인증코드입니다.');
+                            showAlertPopup("ERROR", "잘못된 인증코드입니다.");
                             isVerified = false;
                         } else {
-                            alert('인증 실패. 다시 시도해주세요.');
+                            showAlertPopup("ERROR", "인증 실패. 다시 시도해주세요.");
                             isVerified = false;
                         }
                     } catch (err) {
@@ -189,7 +258,7 @@ export default class ChangePW extends Phaser.Scene {
             if (submitBtn) {
             submitBtn.addEventListener('click', () => {
                 if (!isVerified) {
-                    alert('인증을 먼저 완료해주세요.');
+                    showAlertPopup("CHECK", "인증을 먼저 완료해주세요.");
                 } else {
                     const emailVal = emailInput.value.trim();
                     this.scene.start('NewPW', {email: emailVal});
@@ -199,14 +268,13 @@ export default class ChangePW extends Phaser.Scene {
 
             if (cancelBtn) {
                 cancelBtn.addEventListener('click', () => {
-                    const confirmed = window.confirm('비밀번호 변경을 취소하시겠습니까?');
-                    if (confirmed) {
-                        if (token) {
-                            this.scene.start('Start');  // 로그인 상태면 Start로 이동
-                        } else {
-                            this.scene.start('LoginScreen');  // 비로그인 상태면 LoginScreen
+                    const confirmed = showAlertPopup(" ", "비밀번호 변경을 취소하시겠습니까?", () => {
+                        if(token) {
+                            this.scene.start('Start');
+                        }else {
+                            this.scene.start('LoginScreen');
                         }
-                    }
+                    });
                 });
             }
 
