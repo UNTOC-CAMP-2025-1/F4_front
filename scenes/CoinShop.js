@@ -13,6 +13,44 @@ export default class CoinShop extends Phaser.Scene {
     create() {
         const { width, height } = this.cameras.main;
         const centerX = width / 2;
+        const token = localStorage.getItem('token');
+        let purchasedItems = [];
+
+        const fetchPurchasedItems = async () => {
+            if (!token) return;
+
+            try {
+                const res = await fetch('http://34.169.165.241:8000/user_character/user_character?domain=user_character', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    purchasedItems = data.map(item => item.character_id);
+
+                    // 버튼 스타일 업데이트
+                    purchasedItems.forEach(index => {
+                        const btn = document.getElementById(`shop-item-${index}`);
+                        if (btn) {
+                            btn.style.backgroundColor = '#ccc';
+                            btn.style.border = '3px solid #ffffff';
+                            btn.style.filter = 'grayscale(50%) brightness(0.9)';
+                        }
+                    });
+
+                } else {
+                    console.warn('구매 목록 불러오기 실패:', res.status);
+                }
+            } catch (err) {
+                console.error('구매 목록 요청 실패:', err);
+            }
+        };
+
+        // 이 위치에서 호출
+        fetchPurchasedItems();
 
         // 배경
         this.add.image(0, 0, 'shop_bg').setOrigin(0).setDisplaySize(width, height);
@@ -82,12 +120,243 @@ export default class CoinShop extends Phaser.Scene {
             // 원하는 만큼 추가 가능
         ];
 
-        const itemHTML = itemList.map(item => `
-            <button class="shop-button" data-amount="${item.amount}">
+        const itemHTML = itemList.map((item, index) => `
+            <button class="shop-button" id="shop-item-${index}" data-amount="${item.amount}">
                 <img src="${item.img}" />
                 <div class="label">${item.amount} COIN</div>
             </button>
         `).join('');
+
+        // 팝업 DOM 요소 생성 함수
+        const showPurchasePopup = (amount) => {
+            const popup = document.createElement('div');
+            popup.id = 'purchase-popup';
+            popup.innerHTML = `
+                <style>
+                    #purchase-popup {
+                        position: fixed;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        background-color: #e8d6ff;
+                        padding: 30px 50px;
+                        border-radius: 25px;
+                        font-family: Arial, sans-serif;
+                        text-align: center;
+                        z-index: 1000;
+                        box-shadow: 0 0 20px rgba(0,0,0,0.4);
+                    }
+
+                    #purchase-popup h2 {
+                        font-size: 40px;
+                        font-weight: bold;
+                        color: #333;
+                        margin-bottom: 10px;
+                    }
+
+                    #purchase-popup p {
+                        font-size: 24px;
+                        margin: 20px 0;
+                        color: #444;
+                    }
+
+                    .btn-group {
+                        display: flex;
+                        justify-content: center;
+                        gap: 30px;
+                        margin-top: 20px;
+                    }
+
+                    .confirm-btn, .cancel-btn {
+                        font-size: 22px;
+                        padding: 10px 24px;
+                        border-radius: 12px;
+                        cursor: pointer;
+                        font-weight: bold;
+                        background-color: #b493d6;
+                        color: white;
+                        border: none;
+                        transition: transform 0.2s ease, background-color 0.2s ease;
+                    }
+
+                    .confirm-btn:hover, .cancel-btn:hover {
+                        transform: scale(1.08);
+                        background-color: #9f7bc7;
+                    }
+                </style>
+                <h2>BUY</h2>
+                <p>스킨을 구매하시겠습니까?</p>
+                <div class="btn-group">
+                    <button class="confirm-btn">확인</button>
+                    <button class="cancel-btn">취소</button>
+                </div>
+            `;
+
+            document.body.appendChild(popup);
+
+            // 확인 버튼 이벤트
+            popup.querySelector('.confirm-btn').addEventListener('click', () => {
+                console.log(`${amount} 코인 결제 확인`);
+                popup.remove();
+
+                if (selectedCharacterId !== null) {
+                    sendCharacterToBackend(selectedCharacterId);
+                }
+            });
+
+
+            // 취소 버튼 이벤트
+            popup.querySelector('.cancel-btn').addEventListener('click', () => {
+                popup.remove();
+            });
+        };
+
+        //나만의 준표
+        const showBlockedPopup = () => {
+            const popup = document.createElement('div');
+            popup.id = 'blocked-popup';
+            popup.innerHTML = `
+                <style>
+                    #blocked-popup {
+                        position: fixed;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        background-color: #e8d6ff;
+                        padding: 30px 50px;
+                        border-radius: 25px;
+                        font-family: Arial, sans-serif;
+                        text-align: center;
+                        z-index: 1000;
+                        box-shadow: 0 0 20px rgba(0,0,0,0.4);
+                    }
+
+                    #blocked-popup h2 {
+                        font-size: 40px;
+                        font-weight: bold;
+                        color: #333;
+                        margin-bottom: 10px;
+                    }
+
+                    #blocked-popup p {
+                        font-size: 24px;
+                        margin: 20px 0;
+                        color: #444;
+                    }
+
+                    .btn-group {
+                        display: flex;
+                        justify-content: center;
+                        margin-top: 20px;
+                    }
+
+                    .confirm-btn {
+                        font-size: 22px;
+                        padding: 10px 24px;
+                        border-radius: 12px;
+                        cursor: pointer;
+                        font-weight: bold;
+                        background-color: #b493d6;
+                        color: white;
+                        border: none;
+                        transition: transform 0.2s ease, background-color 0.2s ease;
+                    }
+
+                    .confirm-btn:hover {
+                        transform: scale(1.08);
+                        background-color: #9f7bc7;
+                    }
+                </style>
+                <h2>F4<h2>
+                <p>'그'는 구매할 수 없습니다.</p>
+                <div class="btn-group">
+                    <button class="confirm-btn">확인</button>
+                </div>
+            `;
+            document.body.appendChild(popup);
+
+            popup.querySelector('.confirm-btn').addEventListener('click', () => {
+                popup.remove();
+            });
+        };
+
+
+        const showSkinChangePopup = (characterId) => {
+            const popup = document.createElement('div');
+            popup.id = 'change-popup';
+            popup.innerHTML = `
+                <style>
+                    #change-popup {
+                        position: fixed;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        background-color: #e8d6ff;
+                        padding: 30px 50px;
+                        border-radius: 25px;
+                        font-family: Arial, sans-serif;
+                        text-align: center;
+                        z-index: 1000;
+                        box-shadow: 0 0 20px rgba(0,0,0,0.4);
+                    }
+
+                    #change-popup h2 {
+                        font-size: 40px;
+                        font-weight: bold;
+                        color: #333;
+                        margin-bottom: 10px;
+                    }
+
+                    #change-popup p {
+                        font-size: 24px;
+                        margin: 20px 0;
+                        color: #444;
+                    }
+
+                    .btn-group {
+                        display: flex;
+                        justify-content: center;
+                        gap: 30px;
+                        margin-top: 20px;
+                    }
+
+                    .confirm-btn, .cancel-btn {
+                        font-size: 22px;
+                        padding: 10px 24px;
+                        border-radius: 12px;
+                        cursor: pointer;
+                        font-weight: bold;
+                        background-color: #b493d6;
+                        color: white;
+                        border: none;
+                        transition: transform 0.2s ease, background-color 0.2s ease;
+                    }
+
+                    .confirm-btn:hover, .cancel-btn:hover {
+                        transform: scale(1.08);
+                        background-color: #9f7bc7;
+                    }
+                </style>
+                <h2>CHANGE</h2>
+                <p>해당 스킨으로 변경하겠습니까?</p>
+                <div class="btn-group">
+                    <button class="confirm-btn">확인</button>
+                    <button class="cancel-btn">취소</button>
+                </div>
+            `;
+
+            document.body.appendChild(popup);
+
+            popup.querySelector('.confirm-btn').addEventListener('click', () => {
+                popup.remove();
+                alert(`스킨 ${characterId}로 변경되었습니다!`);
+                // TODO: 실제 변경 API 호출 가능
+            });
+
+            popup.querySelector('.cancel-btn').addEventListener('click', () => {
+                popup.remove();
+            });
+        };
 
         //item 보이는 부분
         this.add.dom(centerX+550, 450).createFromHTML(`
@@ -159,14 +428,34 @@ export default class CoinShop extends Phaser.Scene {
         </div>
         `);
 
+        let selectedCharacterId = null;
+
         this.time.delayedCall(0, () => {
-            document.querySelectorAll('.shop-button').forEach(btn => {
+            document.querySelectorAll('.shop-button').forEach((btn, index) => {
                 btn.addEventListener('click', () => {
                     const amount = btn.dataset.amount;
-                    console.log(`${amount} COIN 상품 클릭됨`);
+                    selectedCharacterId = index;
+
+                    if (index === 0) {
+                        showBlockedPopup();
+                        return;
+                    }
+
+                    if (purchasedItems.includes(index)) {
+                        showSkinChangePopup(index);
+                    } else {
+                        showPurchasePopup(amount);
+                    }
                 });
+
+                if (purchasedItems.includes(index)) {
+                    btn.style.backgroundColor = '#ccc';
+                    btn.style.border = '3px solid #ffffff';
+                    btn.style.filter = 'grayscale(50%) brightness(0.9)';
+                }
             });
         });
+
 
 
 
@@ -178,5 +467,54 @@ export default class CoinShop extends Phaser.Scene {
             .on('pointerdown', () => {
                 this.scene.start('MyInfo');
             });
+
+        const sendCharacterToBackend = async (characterId) => {
+            const token = localStorage.getItem('token'); // 로그인 시 저장한 토큰 꺼내기
+
+            if (!token) {
+                alert("로그인이 필요합니다.");
+                console.error("토큰 없음: 인증 실패");
+                return;
+            }
+
+            try {
+                const response = await fetch('http://34.169.165.241:8000/user_character/user_character?domain=user_character', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`  // ← 여기에 토큰 삽입!
+                    },
+                    body: JSON.stringify({ character_id: characterId })  // 가격은 안 보냄
+                });
+
+                if (!response.ok) {
+                    if (response.status === 401 || response.status === 403) {
+                        alert("세션이 만료되었거나 권한이 없습니다. 다시 로그인해주세요.");
+                        localStorage.removeItem('token');
+                        this.scene.start('LoginScreen'); // 또는 적절한 경로로 리다이렉트
+                    } else {
+                        throw new Error(`서버 응답 오류: ${response.status}`);
+                    }
+                }
+
+                const data = await response.json();
+                console.log('서버 응답:', data);
+                alert("구매가 완료되었습니다!");
+                purchasedItems.push(characterId);
+
+                // 버튼 스타일 다시 적용
+                document.getElementById(`shop-item-${characterId}`).style.backgroundColor = '#ccc';
+                document.getElementById(`shop-item-${characterId}`).style.border = '3px solid #ffffff';
+                document.getElementById(`shop-item-${characterId}`).style.filter = 'grayscale(50%) brightness(0.9)';
+
+
+            } catch (error) {
+                console.error('전송 실패:', error);
+                alert("구매 요청 실패: 서버 문제 또는 네트워크 오류");
+            }
+        };
+
+
+
     }
 }
