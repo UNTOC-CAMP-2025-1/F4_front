@@ -34,6 +34,22 @@ export default class Shadow {
     }
   }
 
+
+  /**
+   * 새로운 shadow 스프라이트 추가
+   * @param {number} x
+   * @param {number} y
+   */
+  add(x, y) {
+    const sh = this.scene.add
+      .sprite(x, y, 'shadow')
+      .setOrigin(0.5)
+      .setScale(this.scale)
+      .setDepth(0);
+    this.shadowGroup.add(sh);
+    this.shadows.push(sh);
+  }
+  
   /**
    * 매 프레임 호출: shadows 위치·alpha·tint 업데이트
    */

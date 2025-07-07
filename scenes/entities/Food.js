@@ -14,8 +14,7 @@ export default class Food {
     // spriteKey로 어떤 이미지를 쓸지 결정
     this.sprite = scene.physics.add.sprite(x, y, spriteKey)
       .setOrigin(0.5)
-      .setScale(0.5);           // 필요시 크기 조정
-      // .setTint(0xff0000);     // 투톤 효과 원치 않으면 제거
+      .setScale(0.3);           // 필요시 크기 조정
 
     // 물리 바디 반지름도 displayWidth 기준으로 재설정
     this.sprite.body.setCircle(this.sprite.displayWidth * 0.5);
