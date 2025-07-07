@@ -21,6 +21,10 @@ export default class WormStart extends Phaser.Scene {
   }
 
   create() {
+
+    const graphics = this.add.graphics();
+    this.physics.world.createDebugGraphic(graphics);
+    
     const w = this.scale.width;
     const h = this.scale.height;
 
@@ -42,6 +46,15 @@ export default class WormStart extends Phaser.Scene {
         Util.randomInt(-h, h)
       );
     }
+    console.log('▶ foodGroup size =', this.foodGroup.getLength());
+    this.foodGroup.getChildren().forEach((sprite, i) => {
+      console.log(
+        `   food#${i}`,
+        'pos=', sprite.x, sprite.y,
+        'body=', !!sprite.body
+      );
+    });
+
 
     // 플레이어 스네이크 (sectionKey='circle', headKey='face')
     const player = new PlayerSnake(this, 'circle', 'face', 0, 0);
@@ -63,9 +76,8 @@ export default class WormStart extends Phaser.Scene {
         snake.head,
         this.foodGroup,
         (headSprite, foodSprite) => {
-          console.log('충돌!', headSprite, foodSprite);
-          foodSprite.destroy();
-          //foodSprite.food.onHit(headSprite)
+          console.log('충돌 detected!', headSprite, foodSprite);
+          foodSprite.food.onHit(headSprite)
         },
         null,
         this
