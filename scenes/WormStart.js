@@ -29,7 +29,7 @@ export default class WormStart extends Phaser.Scene {
 
     // 물리 경계 & 그룹
     this.physics.world.setBounds(-w, -h, w * 2, h * 2);
-    this.foodGroup = this.physicsadd.group();
+    this.foodGroup = this.physics.add.group();
     this.snakes    = [];
 
     // 음식 100개 흩뿌리기
