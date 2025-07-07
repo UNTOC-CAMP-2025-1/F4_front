@@ -11,6 +11,10 @@ export default class Snake {
    * @param {number} y
    */
   constructor(scene, sectionKey, headKey, x, y) {
+    this.food = []; 
+    //먹이 먹은 횟수
+    this.foodEatenCount = 0;
+    this.growThreshold  = 5;
     this.scene      = scene;
     scene.snakes    = scene.snakes || [];
     scene.snakes.push(this);
@@ -18,7 +22,6 @@ export default class Snake {
     this.sectionKey = sectionKey;
     this.headKey    = headKey;
     this.scale      = 0.6;
-    this.headScale  = 0.4;
     this.fastSpeed  = 200;
     this.slowSpeed  = 130;
     this.speed      = this.slowSpeed;
@@ -37,8 +40,7 @@ export default class Snake {
     // — 헤드 생성 (headKey 사용) —
     this.head = scene.physics.add.sprite(x, y, this.headKey)
       .setOrigin(0.5)
-      .setScale(this.scale)
-      .setScale(this.headScale);
+      .setScale(this.scale);
     this.head.snake = this;
     this.head.body.setCircle(this.head.width * 0.5);
     this.head.body.setCollideWorldBounds(false);
@@ -170,7 +172,6 @@ export default class Snake {
 
   setScale(scale) {
     this.scale = scale;
-    this.head.setScale(this.headScale);
     this.preferredDistance = 30 * scale;
     this.sections.forEach(sec => {
       sec.setScale(scale);
@@ -208,5 +209,15 @@ export default class Snake {
 
   addDestroyedCallback(func, ctx) {
     this.onDestroyedCallbacks.push({ func, ctx });
+  }
+
+  onFoodEaten() {
+    this.foodEatenCount++;
+    if (this.foodEatenCount >= this.growThreshold) {
+      this.foodEatenCount = 0;
+      // 꼬리 끝자리(마지막 섹션) 위치에서 새 섹션 추가
+      const tail = this.sections[this.sections.length - 1];
+      this.addSectionAtPosition(tail.x, tail.y);
+    }
   }
 }
