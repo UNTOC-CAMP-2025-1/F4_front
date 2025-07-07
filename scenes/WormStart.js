@@ -53,13 +53,20 @@ export default class WormStart extends Phaser.Scene {
     const bot2 = new BotSnake(this, 'circle', 'face',  200, 0);
     this.snakes.push(bot1, bot2);
 
+    player.head.setScale(0.4);// 머리 크기 조절
+    this.cameras.main.startFollow(player.head);
+
     // 충돌&파괴 콜백
     this.snakes.forEach(snake => {
       // food랑 부딪히면 eat() 호출
       this.physics.add.overlap(
         snake.head,
         this.foodGroup,
-        (headSprite, foodSprite) => foodSprite.food.onHit(headSprite),
+        (headSprite, foodSprite) => {
+          console.log('충돌!', headSprite, foodSprite);
+          foodSprite.destroy();
+          //foodSprite.food.onHit(headSprite)
+        },
         null,
         this
       );

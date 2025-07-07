@@ -18,6 +18,7 @@ export default class Snake {
     this.sectionKey = sectionKey;
     this.headKey    = headKey;
     this.scale      = 0.6;
+    this.headScale  = 0.4;
     this.fastSpeed  = 200;
     this.slowSpeed  = 130;
     this.speed      = this.slowSpeed;
@@ -36,7 +37,8 @@ export default class Snake {
     // — 헤드 생성 (headKey 사용) —
     this.head = scene.physics.add.sprite(x, y, this.headKey)
       .setOrigin(0.5)
-      .setScale(this.scale);
+      .setScale(this.scale)
+      .setScale(this.headScale);
     this.head.snake = this;
     this.head.body.setCircle(this.head.width * 0.5);
     this.head.body.setCollideWorldBounds(false);
@@ -141,7 +143,6 @@ export default class Snake {
       this.onCycleComplete();
     }
 
-    // 6) 섀도우 업데이트 (눈 기능 제거)
     this.shadow.update();
   }
 
@@ -169,6 +170,7 @@ export default class Snake {
 
   setScale(scale) {
     this.scale = scale;
+    this.head.setScale(this.headScale);
     this.preferredDistance = 30 * scale;
     this.sections.forEach(sec => {
       sec.setScale(scale);

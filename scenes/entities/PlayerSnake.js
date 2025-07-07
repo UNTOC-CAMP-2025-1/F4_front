@@ -16,6 +16,8 @@ export default class PlayerSnake extends Snake {
   constructor(scene, sectionKey, headKey, x, y) {
     super(scene, sectionKey, headKey, x, y);
 
+    this.head.setScale(0.4);
+
     // 화살표 키 입력용
     this.cursors = scene.input.keyboard.createCursorKeys();
 
