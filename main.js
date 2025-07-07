@@ -19,10 +19,16 @@ const config = {
     width: window.innerWidth,
     height: window.innerHeight,
     parent: 'game-container',
+    physics: {
+    default: 'arcade',
+    arcade: {
+      debug: false
+    }
+  },
     scene: [Start, Home, LoginScreen, SignUp, ChangePW, NewPW, BestScore, CoinShop, GameOver, MyInfo, MyScore, ProfileChange,WormStart, RankBoard, GamePage],
     dom: {
         createContainer: true
     }
 };
 
-const game = new Phaser.Game(config);
+new Phaser.Game(config);
