@@ -1,3 +1,5 @@
+import Snake from './Snake.js';
+
 /**
  * Player of the core snake for controls
  * @param  {Phaser.Game} game      game object
@@ -5,7 +7,7 @@
  * @param  {Number} x         coordinate
  * @param  {Number} y         coordinate
  */
-PlayerSnake = function(game, spriteKey, x, y) {
+function PlayerSnake(game, spriteKey, x, y) {
     Snake.call(this, game, spriteKey, x, y);
     this.cursors = game.input.keyboard.createCursorKeys();
 
@@ -74,3 +76,5 @@ PlayerSnake.prototype.update = function() {
     //call the original snake update method
     this.tempUpdate();
 }
+
+export default PlayerSnake;
