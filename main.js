@@ -12,13 +12,14 @@ import MyScore from './scenes/MyScore.js';
 import ProfileChange from './scenes/ProfileChange.js';
 import RankBoard from './scenes/RankBoard.js';
 import GamePage from './scenes/GamePage.js';
+import WormStart from './scenes/WormStart.js';
 
 const config = {
     type: Phaser.AUTO,
     width: window.innerWidth,
     height: window.innerHeight,
     parent: 'game-container',
-    scene: [Start, Home, LoginScreen, SignUp, ChangePW, NewPW, BestScore, CoinShop, GameOver, MyInfo, MyScore, ProfileChange, RankBoard, GamePage],
+    scene: [Start, Home, LoginScreen, SignUp, ChangePW, NewPW, BestScore, CoinShop, GameOver, MyInfo, MyScore, ProfileChange,WormStart, RankBoard, GamePage],
     dom: {
         createContainer: true
     }

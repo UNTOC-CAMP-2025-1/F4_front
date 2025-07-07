@@ -96,7 +96,7 @@ export default class Home extends Phaser.Scene {
             const heartBtn = document.getElementById('heart-btn');
             if (heartBtn) {
                 heartBtn.addEventListener('click', () => {
-                    this.scene.start('GamePage');
+                    this.scene.start('WormStart');
                 });
             }
         });
