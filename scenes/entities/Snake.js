@@ -22,15 +22,15 @@ export default class Snake {
     this.slowSpeed  = 130;
     this.speed      = this.slowSpeed;
     this.rotationSpeed    = 0.05;       // rad/s
-    this.preferredDistance = 17 * this.scale;
+    this.preferredDistance = 30 * this.scale;
     this.queuedSections    = 0;
 
     this.sections    = [];
     this.headPath    = [];
     this.snakeLength = 0;
 
-    // 섀도우 & 섹션 그룹
-    this.shadow       = new Shadow(scene, this.sections, this.scale);
+    // 섀도우 & 섹션 그룹 (spacing=2 → 두 칸마다 하나씩 그림자)
+    this.shadow = new Shadow(scene, this.sections, this.scale, 2);
     this.sectionGroup = scene.physics.add.group();
 
     // — 헤드 생성 (headKey 사용) —
@@ -40,6 +40,9 @@ export default class Snake {
     this.head.snake = this;
     this.head.body.setCircle(this.head.width * 0.5);
     this.head.body.setCollideWorldBounds(false);
+
+    // head depth
+    this.head.setDepth(2);
 
     // 마지막 헤드 위치 저장
     this.lastHeadPosition = new Phaser.Math.Vector2(this.head.x, this.head.y);
@@ -81,6 +84,8 @@ export default class Snake {
       .setScale(this.scale);
     sec.body.setCircle(sec.width * 0.5);
     sec.body.immovable = true;
+
+    sec.setDepth(1);
 
     this.snakeLength++;
     this.sections.push(sec);
@@ -164,7 +169,7 @@ export default class Snake {
 
   setScale(scale) {
     this.scale = scale;
-    this.preferredDistance = 17 * scale;
+    this.preferredDistance = 30 * scale;
     this.sections.forEach(sec => {
       sec.setScale(scale);
       sec.body.setCircle(sec.width * 0.5);

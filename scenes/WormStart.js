@@ -1,5 +1,6 @@
 // src/scenes/WormStart.js
 import PlayerSnake from './entities/PlayerSnake.js';
+import BotSnake from './entities/BotSnake.js'
 import Food        from './entities/Food.js';
 import Util        from './Util.js';
 
