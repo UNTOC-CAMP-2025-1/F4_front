@@ -10,16 +10,20 @@ import MyInfo from './scenes/MyInfo.js';
 import MyScore from './scenes/MyScore.js';
 import ProfileChange from './scenes/ProfileChange.js';
 import RankBoard from './scenes/RankBoard.js';
-import game from './scenes/game.js'
+import WormStart from './scenes/wormstart.js';
 
 const config = {
     type: Phaser.AUTO,
     width: window.innerWidth,
     height: window.innerHeight,
     parent: 'game-container',
-    scene: [Start, Home, LoginScreen, SignUp, ChangePW, NewPW, BestScore, CoinShop, MyInfo, MyScore, ProfileChange, RankBoard, game],
+    scene: [Start, Home, LoginScreen, SignUp, ChangePW, NewPW, BestScore, CoinShop, MyInfo, MyScore, ProfileChange, RankBoard, WormStart],
     dom: {
         createContainer: true
     }
 };
+
+new Phaser.Game(config);
+
+
 

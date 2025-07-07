@@ -4,18 +4,18 @@ import BotSnake    from './entities/BotSnake.js';
 import Food        from './entities/Food.js';
 import Util        from './Util.js';
 
-export default class game extends Phaser.Scene {
+export default class WormStart extends Phaser.Scene {
   constructor() {
-    super('game');
+    super('WormStart');
   }
 
   preload() {
     // 몸통(section)과 얼굴(head) 이미지 둘 다 로드
-    this.load.image('circle',     'asset/food2.png');  // section
-    this.load.image('face',       'asset/character.png');   // head
-    this.load.image('shadow',     'asset/food3.png');
-    this.load.image('background', 'asset/tile.png');
-    this.load.image('food',       'asset/food1.png');
+    this.load.image('circle', 'assets/food2.png');  // section
+    this.load.image('face', 'assets/character.png');   // head
+    this.load.image('shadow', 'assets/food3.png');
+    this.load.image('background', 'assets/tile.png');
+    this.load.image('food', 'assets/food1.png');
   }
 
   create() {

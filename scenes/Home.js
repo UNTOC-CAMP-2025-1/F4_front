@@ -96,7 +96,7 @@ create() {
         const heartBtn = document.getElementById('heart-btn');
         if (heartBtn) {
             heartBtn.addEventListener('click', () => {
-                this.scene.start('game');
+                this.scene.start('WormStart');
             });
         }
     });
