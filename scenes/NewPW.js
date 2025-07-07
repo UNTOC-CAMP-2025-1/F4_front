@@ -10,6 +10,151 @@ export default class NewPW extends Phaser.Scene {
     create(data) {
         const emailFromPrev = data?.email || '';
 
+        const showAlertPopup = (title, message, onConfirm = null) => {
+            const popup = document.createElement('div');
+            popup.id = 'alert-popup';
+            popup.innerHTML = `
+                <style>
+                    #alert-popup {
+                        position: fixed;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        background-color: #fbefff;
+                        padding: 30px 50px;
+                        border-radius: 25px;
+                        font-family: Arial, sans-serif;
+                        text-align: center;
+                        z-index: 1000;
+                        box-shadow: 0 0 20px rgba(0,0,0,0.4);
+                    }
+
+                    #alert-popup h2 {
+                        font-size: 36px;
+                        font-weight: bold;
+                        color: #6b4c9a;
+                        margin-bottom: 10px;
+                    }
+
+                    #alert-popup p {
+                        font-size: 22px;
+                        margin: 20px 0;
+                        color: #444;
+                    }
+
+                    .btn-group {
+                        display: flex;
+                        justify-content: center;
+                        margin-top: 20px;
+                        gap: 20px;
+                    }
+
+                    .confirm-btn, .cancel-btn {
+                        font-size: 20px;
+                        padding: 10px 24px;
+                        border-radius: 12px;
+                        cursor: pointer;
+                        font-weight: bold;
+                        background-color: #b493d6;
+                        color: white;
+                        border: none;
+                        transition: transform 0.2s ease, background-color 0.2s ease;
+                    }
+
+                    .confirm-btn:hover, .cancel-btn:hover {
+                        transform: scale(1.08);
+                        background-color: #9f7bc7;
+                    }
+                </style>
+                <h2>${title}</h2>
+                <p>${message}</p>
+                <div class="btn-group">
+                    <button class="confirm-btn">확인</button>
+                    <button class="cancel-btn">취소</button>
+                </div>
+            `;
+
+            document.body.appendChild(popup);
+            popup.querySelector('.confirm-btn').addEventListener('click', () => {
+                popup.remove();
+                if (onConfirm) onConfirm();
+            });
+
+            popup.querySelector('.cancel-btn').addEventListener('click', () => {
+                popup.remove();
+            })
+        };
+
+        const showAlertPopup_2 = (title, message, onConfirm = null) => {
+            const popup = document.createElement('div');
+            popup.id = 'alert-popup';
+            popup.innerHTML = `
+                <style>
+                    #alert-popup {
+                        position: fixed;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        background-color: #fbefff;
+                        padding: 30px 50px;
+                        border-radius: 25px;
+                        font-family: Arial, sans-serif;
+                        text-align: center;
+                        z-index: 1000;
+                        box-shadow: 0 0 20px rgba(0,0,0,0.4);
+                    }
+
+                    #alert-popup h2 {
+                        font-size: 36px;
+                        font-weight: bold;
+                        color: #6b4c9a;
+                        margin-bottom: 10px;
+                    }
+
+                    #alert-popup p {
+                        font-size: 22px;
+                        margin: 20px 0;
+                        color: #444;
+                    }
+
+                    .btn-group {
+                        display: flex;
+                        justify-content: center;
+                        margin-top: 20px;
+                        gap: 20px;
+                    }
+
+                    .confirm-btn {
+                        font-size: 20px;
+                        padding: 10px 24px;
+                        border-radius: 12px;
+                        cursor: pointer;
+                        font-weight: bold;
+                        background-color: #b493d6;
+                        color: white;
+                        border: none;
+                        transition: transform 0.2s ease, background-color 0.2s ease;
+                    }
+
+                    .confirm-btn:hover {
+                        transform: scale(1.08);
+                        background-color: #9f7bc7;
+                    }
+                </style>
+                <h2>${title}</h2>
+                <p>${message}</p>
+                <div class="btn-group">
+                    <button class="confirm-btn">확인</button>
+                </div>
+            `;
+
+            document.body.appendChild(popup);
+            popup.querySelector('.confirm-btn').addEventListener('click', () => {
+                popup.remove();
+                if (onConfirm) onConfirm();
+            });
+        };
+
         this.add.image(0, 0, 'NewPWback')
             .setOrigin(0)
             .setDisplaySize(this.cameras.main.width, this.cameras.main.height);
@@ -85,9 +230,9 @@ export default class NewPW extends Phaser.Scene {
                     const email = emailInput.value.trim();
 
                     if (!pw || !confirm || !email) {
-                        alert('새로운 비밀번호를 입력해주세요.');
+                        showAlertPopup_2("CHECK", "새로운 비밀번호를 입력해주세요.");
                     } else if (pw !== confirm) {
-                        alert('새로운 비밀번호가 일치하지 않습니다.');
+                        showAlertPopup_2("ERROR", "새로운 비밀번호가 일치하지 않습니다.");
                     } else {
                         try {
                             const response = await fetch(
@@ -98,10 +243,13 @@ export default class NewPW extends Phaser.Scene {
                             );
 
                             if (response.ok) {
-                                alert('비밀번호가 변경되었습니다.');
-                                this.scene.start('LoginScreen');
+                                showAlertPopup_2("변경 완료", "비밀번호가 변경되었습니다.", () => {
+                                    this.scene.start('LoginScreen');
+                                });
                             } else {
-                                alert('비밀번호 변경에 실패했습니다.');
+                                showAlertPopup_2("ERROR", "비밀번호 변경에 실패했습니다.", () => {
+                                    this.scene.start('LoginScreen');
+                                });
                             }
                         } catch (err) {
                             console.error('비밀번호 변경 요청 실패:', err);
@@ -114,10 +262,9 @@ export default class NewPW extends Phaser.Scene {
             
             if (cancelBtn) {
                 cancelBtn.addEventListener('click', () => {
-                    const confirmed = window.confirm('비밀번호 변경을 취소하시겠습니까?');
-                    if (confirmed) {
-                        this.scene.start('LoginScreen');
-                    }
+                    const confirmed = showAlertPopup(" ", "비밀번호 변경을 취소하시겠습니까?", () => {
+                        this.scene.start('LoginScreen')
+                    });
                 });
             }
         });

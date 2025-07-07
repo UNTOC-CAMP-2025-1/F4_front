@@ -9,6 +9,150 @@ export default class SignUp extends Phaser.Scene {
 
     create() {
 
+        const showAlertPopup = (title, message, onConfirm = null) => {
+            const popup = document.createElement('div');
+            popup.id = 'alert-popup';
+            popup.innerHTML = `
+                <style>
+                    #alert-popup {
+                        position: fixed;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        background-color: #fbefff;
+                        padding: 30px 50px;
+                        border-radius: 25px;
+                        font-family: Arial, sans-serif;
+                        text-align: center;
+                        z-index: 1000;
+                        box-shadow: 0 0 20px rgba(0,0,0,0.4);
+                    }
+
+                    #alert-popup h2 {
+                        font-size: 36px;
+                        font-weight: bold;
+                        color: #6b4c9a;
+                        margin-bottom: 10px;
+                    }
+
+                    #alert-popup p {
+                        font-size: 22px;
+                        margin: 20px 0;
+                        color: #444;
+                    }
+
+                    .btn-group {
+                        display: flex;
+                        justify-content: center;
+                        margin-top: 20px;
+                    }
+
+                    .confirm-btn {
+                        font-size: 20px;
+                        padding: 10px 24px;
+                        border-radius: 12px;
+                        cursor: pointer;
+                        font-weight: bold;
+                        background-color: #b493d6;
+                        color: white;
+                        border: none;
+                        transition: transform 0.2s ease, background-color 0.2s ease;
+                    }
+
+                    .confirm-btn:hover {
+                        transform: scale(1.08);
+                        background-color: #9f7bc7;
+                    }
+                </style>
+                <h2>${title}</h2>
+                <p>${message}</p>
+                <div class="btn-group">
+                    <button class="confirm-btn">확인</button>
+                </div>
+            `;
+
+            document.body.appendChild(popup);
+            popup.querySelector('.confirm-btn').addEventListener('click', () => {
+                popup.remove();
+                if (onConfirm) onConfirm();
+            });
+        };
+
+        const showAlertPopup_2 = (title, message, onConfirm = null) => {
+            const popup = document.createElement('div');
+            popup.id = 'alert-popup';
+            popup.innerHTML = `
+                <style>
+                    #alert-popup {
+                        position: fixed;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        background-color: #fbefff;
+                        padding: 30px 50px;
+                        border-radius: 25px;
+                        font-family: Arial, sans-serif;
+                        text-align: center;
+                        z-index: 1000;
+                        box-shadow: 0 0 20px rgba(0,0,0,0.4);
+                    }
+
+                    #alert-popup h2 {
+                        font-size: 36px;
+                        font-weight: bold;
+                        color: #6b4c9a;
+                        margin-bottom: 10px;
+                    }
+
+                    #alert-popup p {
+                        font-size: 22px;
+                        margin: 20px 0;
+                        color: #444;
+                    }
+
+                    .btn-group {
+                        display: flex;
+                        justify-content: center;
+                        margin-top: 20px;
+                        gap: 20px;
+                    }
+
+                    .confirm-btn, .cancel-btn {
+                        font-size: 20px;
+                        padding: 10px 24px;
+                        border-radius: 12px;
+                        cursor: pointer;
+                        font-weight: bold;
+                        background-color: #b493d6;
+                        color: white;
+                        border: none;
+                        transition: transform 0.2s ease, background-color 0.2s ease;
+                    }
+
+                    .confirm-btn:hover, .cancel-btn:hover {
+                        transform: scale(1.08);
+                        background-color: #9f7bc7;
+                    }
+                </style>
+                <h2>${title}</h2>
+                <p>${message}</p>
+                <div class="btn-group">
+                    <button class="confirm-btn">확인</button>
+                    <button class="cancel-btn">취소</button>
+                </div>
+            `;
+
+            document.body.appendChild(popup);
+            popup.querySelector('.confirm-btn').addEventListener('click', () => {
+                popup.remove();
+                if (onConfirm) onConfirm();
+            });
+
+            popup.querySelector('.cancel-btn').addEventListener('click', () => {
+                popup.remove();
+            })
+        };
+
         let isVerified = false;
 
         this.add.image(0, 0, 'signback')
@@ -170,17 +314,17 @@ export default class SignUp extends Phaser.Scene {
                     const cf = document.getElementById('confirm').value.trim();
 
                     if (!id || !email || !pw || !cf) {
-                        alert('모든 항목을 올바르게 입력해주세요.');
+                        showAlertPopup("CHECK", "모든 항목을 올바르게 입력해주세요.");
                         return;
                     }
 
                     if (pw !== cf) {
-                        alert('비밀번호와 확인이 일치하지 않습니다.');
+                        showAlertPopup("CHECK", "비밀번호와 확인이 일치하지 않습니다.");
                         return;
                     }
 
                     if (!isVerified) {
-                        alert('이메일 인증을 먼저 완료해주세요.');
+                        showAlertPopup("CHECK", "이메일 인증을 먼저 완료해주세요.");
                         return;
                     }
 
@@ -198,10 +342,13 @@ export default class SignUp extends Phaser.Scene {
                         });
 
                         if (signupResponse.ok) {
-                            alert('회원가입이 완료되었습니다!');
-                            this.scene.start('LoginScreen');
+                            showAlertPopup("Sign Up", "회원가입이 완료되었습니다!", () => {
+                                this.scene.start('LoginScreen');
+                            });
                         } else {
-                            alert('회원가입 실패');
+                            showAlertPopup("ERROR", "회원가입 실패", () => {
+                                this.scene.start('LoginScreen');
+                            });
                         }
                     } catch (err) {
                         alert('서버 요청 중 오류가 발생했습니다.');
@@ -214,16 +361,12 @@ export default class SignUp extends Phaser.Scene {
             const cancelBtn = document.getElementById('cancel-btn');
             if (cancelBtn) {
                 cancelBtn.addEventListener('click', () => {
-                    const confirmed = window.confirm('회원가입을 취소하시겠습니까?');
-                    if (confirmed) {
+                    const confirmed = showAlertPopup_2(" ", "회원가입을 취소하시겠습니까?", () => {
                         this.scene.start('LoginScreen');
-                    }
+                    });
                 });
             }
         });
-
-
-
 
         const emailInput = document.getElementById('email');
         const idInput = document.getElementById('id');
@@ -238,12 +381,12 @@ export default class SignUp extends Phaser.Scene {
 
             // 입력값 검증
             if (!id || !email || !password || !confirm) {
-                alert('모든 항목을 입력한 후에 인증코드를 받을 수 있습니다.');
+                showAlertPopup("CODE", "모든 항목을 입력한 후에 인증코드를 받을 수 있습니다.");
                 return;
             }
 
             if (password !== confirm) {
-                alert('비밀번호와 확인이 일치하지 않습니다.');
+                showAlertPopup(" ", "비밀번호와 확인이 일치하지 않습니다.");
                 return;
             }
 
@@ -254,9 +397,9 @@ export default class SignUp extends Phaser.Scene {
 
                 if (response.ok) {
                     const resultText = await response.text(); // 서버가 문자열 반환 시 사용
-                    alert('인증코드가 이메일로 전송되었습니다.');
+                    showAlertPopup("CODE", "인증코드가 이메일로 전송되었습니다.");
                 } else {
-                    alert('인증코드 전송 실패');
+                    showAlertPopup("ERROR", "인증코드 전송 실패");
                 }
             } catch (error) {
                 alert('서버 연결 중 오류가 발생했습니다.');
@@ -272,7 +415,7 @@ export default class SignUp extends Phaser.Scene {
             const code = document.getElementById('code').value.trim();
 
             if (!email || !code) {
-                alert('이메일과 인증코드를 모두 입력해주세요.');
+                showAlertPopup("CHECK", "이메일과 인증코드를 모두 입력해주세요.");
                 return;
             }
 
@@ -283,14 +426,14 @@ export default class SignUp extends Phaser.Scene {
 
                 if (response.ok) {
                     const text = await response.text();
-                    alert('인증 성공');
+                    showAlertPopup("CODE", "인증 성공");
                     isVerified = true;
                 } else {
-                    alert('인증 실패');
+                    showAlertPopup("ERROR", "인증 실패");
                     isVerified = false;
                 }
             } catch (error) {
-                alert('서버 연결 중 오류가 발생했습니다.');
+                showAlertPopup("ERROR", "서버 연결 중 오류가 발생했습니다.");
                 isVerified = false;
             }
         });

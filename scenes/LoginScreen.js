@@ -22,6 +22,7 @@ export default class LoginScreen extends Phaser.Scene {
             console.log('Back Button Clicked');
             this.scene.start('Start');
         });
+        
         const showAlertPopup = (title, message, onConfirm = null) => {
             const popup = document.createElement('div');
             popup.id = 'alert-popup';
