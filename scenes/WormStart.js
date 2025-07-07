@@ -14,7 +14,9 @@ export default class WormStart extends Phaser.Scene {
     this.load.image('circle', 'assets/food2.png');  // section
     this.load.image('face', 'assets/character.png');   // head
     this.load.image('shadow', 'assets/food3.png');
-    this.load.image('food', 'assets/food1.png');
+    for (let i = 1; i <= 7; i++) {
+      this.load.image(`food${i}`, `assets/food${i}.png`);
+    }
     this.load.image('tile', 'assets/tile.png');
   }
 
@@ -72,10 +74,13 @@ export default class WormStart extends Phaser.Scene {
   }
 
   initFood(x, y) {
-    const f = new Food(this, x, y);
-    this.foodGroup.add(f.sprite);
-    return f;
-  }
+  const n   = Phaser.Math.Between(1, 7);
+  const key = `food${n}`;
+  const f = new Food(this, x, y, key);
+  this.foodGroup.add(f.sprite);
+  return f;
+}
+
 
   snakeDestroyed(snake) {
     const path = snake.headPath;
