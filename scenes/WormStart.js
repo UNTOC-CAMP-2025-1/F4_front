@@ -1,4 +1,4 @@
-// src/scenes/game.js
+// src/scenes/WormStart.js
 import PlayerSnake from './entities/PlayerSnake.js';
 import BotSnake    from './entities/BotSnake.js';
 import Food        from './entities/Food.js';
@@ -29,7 +29,7 @@ export default class WormStart extends Phaser.Scene {
 
     // 물리 경계 & 그룹
     this.physics.world.setBounds(-w, -h, w * 2, h * 2);
-    this.foodGroup = this.add.group();
+    this.foodGroup = this.physicsadd.group();
     this.snakes    = [];
 
     // 음식 100개 흩뿌리기
