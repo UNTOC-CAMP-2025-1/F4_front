@@ -1,6 +1,5 @@
 // src/scenes/WormStart.js
 import PlayerSnake from './entities/PlayerSnake.js';
-import BotSnake    from './entities/BotSnake.js';
 import Food        from './entities/Food.js';
 import Util        from './Util.js';
 
@@ -14,8 +13,8 @@ export default class WormStart extends Phaser.Scene {
     this.load.image('circle', 'assets/food2.png');  // section
     this.load.image('face', 'assets/character.png');   // head
     this.load.image('shadow', 'assets/food3.png');
-    this.load.image('background', 'assets/tile.png');
     this.load.image('food', 'assets/food1.png');
+    this.load.image('tile', 'assets/tile.png');
   }
 
   create() {
@@ -25,7 +24,8 @@ export default class WormStart extends Phaser.Scene {
     // 카메라 & 배경
     this.cameras.main.setBounds(-w, -h, w * 2, h * 2);
     this.cameras.main.setBackgroundColor('#444');
-    this.add.tileSprite(-w, -h, w * 2, h * 2, 'background');
+    // 수정: world 전체(2w × 2h)를 타일로 덮음
+    this.add.tileSprite(-w,-h,w * 2, h * 2,'tile').setOrigin(0).setTileScale(1).setDepth(-1);
 
     // 물리 경계 & 그룹
     this.physics.world.setBounds(-w, -h, w * 2, h * 2);

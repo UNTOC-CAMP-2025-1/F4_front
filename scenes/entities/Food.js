@@ -12,7 +12,9 @@ export default class Food {
 
     // 1) 스프라이트 생성 및 물리엔진 적용
     this.sprite = scene.physics.add.sprite(x, y, 'food')
-      .setTint(0xff0000);
+      .setTint(0xff0000)
+      .setScale(0.2)
+      .setOrigin(0.5);
     this.sprite.setOrigin(0.5);
     this.sprite.body.setCircle(this.sprite.width * 0.5);
     this.sprite.food = this; // 역참조
