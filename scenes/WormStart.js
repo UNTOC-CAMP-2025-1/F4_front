@@ -62,7 +62,9 @@ export default class WormStart extends Phaser.Scene {
 
     // 봇 스네이크 2마리
     const bot1 = new BotSnake(this, 'circle', 'face', -200, 0);
+    bot1.head.setScale(0.4);
     const bot2 = new BotSnake(this, 'circle', 'face',  200, 0);
+    bot2.head.setScale(0.4);
     this.snakes.push(bot1, bot2);
 
     // 뱀 파괴(죽음) 콜백 등록

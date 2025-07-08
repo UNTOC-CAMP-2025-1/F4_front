@@ -39,7 +39,7 @@ export default class Snake {
       .setScale(this.scale);
     this.head.snake = this;
     this.head.body.setCircle(this.head.width * 0.5);
-    this.head.body.setCollideWorldBounds(false);
+    this.head.body.setCollideWorldBounds(true);
 
     // head depth
     this.head.setDepth(2);
@@ -182,9 +182,10 @@ export default class Snake {
     // 씬의 snakes 배열에서 제거
     this.scene.snakes = this.scene.snakes.filter(s => s !== this);
 
-    // edge, 섹션, 섀도우 파괴
+    // edge, 섹션 파괴
     this.edge.destroy();
     this.sections.forEach(sec => sec.destroy());
+    this.head.destroy();
 
     // destruction 콜백 호출
     this.onDestroyedCallbacks.forEach(cb => cb.func.call(cb.ctx, this));
