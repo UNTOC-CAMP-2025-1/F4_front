@@ -12,7 +12,7 @@ export default class WormStart extends Phaser.Scene {
 
   preload() {
     // 섹션, 머리, 그림자, 먹이, 타일 이미지 로드
-    this.load.image('circle', 'assets/food2.png');
+    this.load.image('circle', 'assets/tiniwormbody.png');
     this.load.image('face',   'assets/character.png');
     this.load.image('shadow', 'assets/food3.png');
     for (let i = 1; i <= 7; i++) {
@@ -26,7 +26,7 @@ export default class WormStart extends Phaser.Scene {
     const h = this.scale.height;
 
     // 디버그 그래픽 (원하면 켜두세요)
-    this.physics.world.createDebugGraphic();
+    //this.physics.world.createDebugGraphic();
 
     // 카메라 & 배경
     this.cameras.main.setBounds(-w, -h, w * 2, h * 2);
@@ -39,7 +39,7 @@ export default class WormStart extends Phaser.Scene {
     // 물리 경계
     this.physics.world.setBounds(-w, -h, w * 2, h * 2);
 
-    // 먹이 그룹 (physics 그룹이지만 overlap 대신 수동 감지)
+    // 먹이 그룹 
     this.foodGroup = this.physics.add.group();
 
     // 뱀들 저장할 배열

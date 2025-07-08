@@ -14,14 +14,14 @@ export default class Snake {
     this.food = []; 
     //먹이 먹은 횟수
     this.foodEatenCount = 0;
-    this.growThreshold  = 5;
+    this.growThreshold  = 1;
     this.scene      = scene;
     scene.snakes    = scene.snakes || [];
     scene.snakes.push(this);
 
     this.sectionKey = sectionKey;
     this.headKey    = headKey;
-    this.scale      = 0.6;
+    this.scale      = 0.15;
     this.fastSpeed  = 200;
     this.slowSpeed  = 130;
     this.speed      = this.slowSpeed;
@@ -212,12 +212,13 @@ export default class Snake {
   }
 
   onFoodEaten() {
-    this.foodEatenCount++;
-    if (this.foodEatenCount >= this.growThreshold) {
-      this.foodEatenCount = 0;
-      // 꼬리 끝자리(마지막 섹션) 위치에서 새 섹션 추가
-      const tail = this.sections[this.sections.length - 1];
-      this.addSectionAtPosition(tail.x, tail.y);
-    }
+  this.foodEatenCount++;
+  console.log(`🐍 onFoodEaten: count=${this.foodEatenCount}`);
+  if (this.foodEatenCount >= this.growThreshold) {
+    this.foodEatenCount = 0;
+    const tail = this.sections[this.sections.length - 1];
+    console.log('➕ 꼬리 한 칸 추가!', tail.x, tail.y);
+    this.addSectionAtPosition(tail.x, tail.y);
   }
+}
 }
