@@ -12,7 +12,7 @@ import MyInfo       from './scenes/MyInfo.js';
 import MyScore      from './scenes/MyScore.js';
 import ProfileChange from './scenes/ProfileChange.js';
 import RankBoard    from './scenes/RankBoard.js';
-import WormStart from './scenes/wormstart.js';
+import WormStart from './scenes/WormStart.js';
 
 const config = {
   type: Phaser.AUTO,

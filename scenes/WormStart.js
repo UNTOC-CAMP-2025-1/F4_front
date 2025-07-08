@@ -179,20 +179,7 @@ export default class WormStart extends Phaser.Scene {
   });
 
 
-  if (snake instanceof PlayerSnake) {
-    this.time.delayedCall(1000, () => {
-      this.scene.start('GameOver');
-    });
-  }
 
-  else {
-    const anyBotLeft = this.snakes.some(s => s instanceof BotSnake && !s.destroyed);
-    if (!anyBotLeft) {
-      this.time.delayedCall(1000, () => {
-        this.scene.start('GameOver');
-      });
-    }
-  }
 }
 
 
