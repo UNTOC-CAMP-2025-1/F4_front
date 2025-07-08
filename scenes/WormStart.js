@@ -12,6 +12,12 @@ export default class WormStart extends Phaser.Scene {
 
   preload() {
 
+    this.load.image('tiniwormbody1', 'assets/tiniwormbody1.png');
+    this.load.image('tiniwormbody2', 'assets/tiniwormbody2.png');
+    this.load.image('tiniwormbody3', 'assets/tiniwormbody3.png');
+    this.load.image('tiniwormbody4', 'assets/tiniwormbody4.png');
+
+
     this.load.image('skin1', 'items/skin1.png');
     this.load.image('skin2', 'items/skin2.png');
     this.load.image('skin3', 'items/skin3.png');
@@ -64,7 +70,14 @@ export default class WormStart extends Phaser.Scene {
     const currentUser = localStorage.getItem('currentUser');
     const savedSkin = currentUser ? localStorage.getItem(`selectedHeadSkin_${currentUser}`) || 'face' : 'face';
 
-    const player = new PlayerSnake(this, 'circle', savedSkin, 0, 0);
+    let bodyTextureKey = 'circle';
+    if (savedSkin === 'skin1') bodyTextureKey = 'tiniwormbody1';
+    else if (savedSkin === 'skin2') bodyTextureKey = 'tiniwormbody2';
+    else if (savedSkin === 'skin3') bodyTextureKey = 'tiniwormbody3';
+    else if (savedSkin === 'skin4') bodyTextureKey = 'tiniwormbody4';
+
+
+    const player = new PlayerSnake(this, bodyTextureKey, savedSkin, 0, 0);
     player.head.setScale(0.4);
 
     this.snakes.push(player);
