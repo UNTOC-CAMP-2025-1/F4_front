@@ -61,7 +61,9 @@ export default class WormStart extends Phaser.Scene {
       );
     }
 
-    const savedSkin = localStorage.getItem('selectedHeadSkin') || 'face';
+    const currentUser = localStorage.getItem('currentUser');
+    const savedSkin = currentUser ? localStorage.getItem(`selectedHeadSkin_${currentUser}`) || 'face' : 'face';
+
     const player = new PlayerSnake(this, 'circle', savedSkin, 0, 0);
     player.head.setScale(0.4);
 

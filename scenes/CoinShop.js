@@ -426,7 +426,10 @@ export default class CoinShop extends Phaser.Scene {
             popup.querySelector('.confirm-btn').addEventListener('click', () => {
                 popup.remove();
                 const key = `skin${characterId}`;  // ← 실제 텍스처 키
-                localStorage.setItem('selectedHeadSkin', key); // ✅ 텍스처 키로 저장
+                const currentUser = localStorage.getItem('currentUser');
+                if (currentUser) {
+                    localStorage.setItem(`selectedHeadSkin_${currentUser}`, key);
+                }
                 alert(`스킨 ${characterId}로 변경되었습니다!`);
             });
 
