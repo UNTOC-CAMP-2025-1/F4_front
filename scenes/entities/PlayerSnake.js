@@ -37,6 +37,7 @@ export default class PlayerSnake extends Snake {
     this.maxSpeed = this.slowSpeed;
   }
 
+  
   update(time, delta) {
     super.update(time, delta);
     const dt = delta / 1000;
@@ -67,5 +68,13 @@ export default class PlayerSnake extends Snake {
       this.currentSpeed,
       this.head.body.velocity
     );
+  }
+  destroy() {
+    const INITIAL_LENGTH = 30;              // initSections(30)과 동일한 값
+    this.score = this.snakeLength - INITIAL_LENGTH;
+    console.log(`💥 Player died! Score = ${this.score}`);
+
+    // 이제 부모 destroy 호출하면 머리·섹션 전부 지워집니다
+    super.destroy();
   }
 }
