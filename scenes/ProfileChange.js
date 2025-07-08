@@ -181,10 +181,10 @@ export default class ProfileChange extends Phaser.Scene {
 
         <div class="scroll-wrapper" id="profile-scroll-box">
             <div class="profile-circle" data-profile-id="1"><img src="assets/character.png" /></div>
-            <div class="profile-circle" data-profile-id="2"><img src="assets/character2.png" /></div>
-            <div class="profile-circle" data-profile-id="3"><img src="assets/character3.png" /></div>
-            <div class="profile-circle" data-profile-id="4"><img src="assets/character4.png" /></div>
-            <div class="profile-circle" data-profile-id="5"><img src="assets/character5.png" /></div>
+            <div class="profile-circle" data-profile-id="2"><img src="items/skin1.png" /></div>
+            <div class="profile-circle" data-profile-id="3"><img src="items/skin2.png" /></div>
+            <div class="profile-circle" data-profile-id="4"><img src="items/skin3.png" /></div>
+            <div class="profile-circle" data-profile-id="5"><img src="items/skin4.png"/></div>
             <div class="profile-circle"></div>
             <div class="profile-circle"></div>
             <div class="profile-circle"></div>
@@ -239,7 +239,7 @@ export default class ProfileChange extends Phaser.Scene {
 
         <div class="button-container">
             <button id="apply-html-btn" class="transparent-btn">적용하기</button>
-            <button id="default-html-btn" class="transparent-btn">기본이미지</button>
+            <button id="default-html-btn" class="transparent-btn">뒤로가기</button>
         </div>
         `);
 
@@ -292,7 +292,7 @@ export default class ProfileChange extends Phaser.Scene {
             });
         }
 
-
+        const defaultHtmlBtn = document.getElementById('default-html-btn');
         if (defaultHtmlBtn) {
             defaultHtmlBtn.addEventListener('click', () => {
                 const mainProfile = document.getElementById('main-profile-display');

@@ -12,6 +12,7 @@ export default class WormStart extends Phaser.Scene {
 
   preload() {
     // 섹션, 머리, 그림자, 먹이, 타일 이미지 로드
+    this.load.image('real_head1', 'newhead/real_head1.png');
     this.load.image('circle', 'assets/tiniwormbody.png');
     this.load.image('face',   'assets/character.png');
     this.load.image('shadow', 'assets/food3.png');
@@ -53,9 +54,14 @@ export default class WormStart extends Phaser.Scene {
       );
     }
 
-    // 플레이어 스네이크
-    const player = new PlayerSnake(this, 'circle', 'face', 0, 0);
-    player.head.setScale(0.4);
+    const savedSkin = localStorage.getItem('selectedHeadSkin') || 'face';
+    const player = new PlayerSnake(this, 'circle', savedSkin, 0, 0);
+    if (savedSkin === 'real_head1') {
+      player.head.setScale(0.25); // 원하는 값으로 조정 (예: 0.25)
+    } else {
+      player.head.setScale(0.4); // 기본값
+    }
+
     this.snakes.push(player);
     this.cameras.main.startFollow(player.head);
 
