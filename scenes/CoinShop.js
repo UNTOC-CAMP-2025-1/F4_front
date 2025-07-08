@@ -8,6 +8,11 @@ export default class CoinShop extends Phaser.Scene {
         this.load.image('arrow', 'assets/arrow.png');
         this.load.image('coin2', 'assets/coin2.png');
         this.load.image('shop_coin', 'assets/coin2.png');
+        this.load.image('skin1', 'items/skin1.png');
+        this.load.image('skin2', 'items/skin2.png');
+        this.load.image('skin3', 'items/skin3.png');
+        this.load.image('skin4', 'items/skin4.png');
+
     }
 
     create() {
@@ -265,13 +270,15 @@ export default class CoinShop extends Phaser.Scene {
 
             // 확인 버튼 이벤트
             popup.querySelector('.confirm-btn').addEventListener('click', () => {
-                console.log(`${amount} 코인 결제 확인`);
                 popup.remove();
-
-                if (selectedCharacterId !== null) {
-                    sendCharacterToBackend(selectedCharacterId);
+                const imgPath = itemList[characterId]?.img;
+                if (imgPath) {
+                    const key = `skin${characterId}`;  // key로 저장!
+                    localStorage.setItem('selectedHeadSkin', imgPath);  // ✅ 저장
+                    alert(`스킨 ${characterId}로 변경되었습니다!`);
                 }
             });
+
 
 
             // 취소 버튼 이벤트
@@ -418,9 +425,11 @@ export default class CoinShop extends Phaser.Scene {
 
             popup.querySelector('.confirm-btn').addEventListener('click', () => {
                 popup.remove();
+                const key = `skin${characterId}`;  // ← 실제 텍스처 키
+                localStorage.setItem('selectedHeadSkin', key); // ✅ 텍스처 키로 저장
                 alert(`스킨 ${characterId}로 변경되었습니다!`);
-                // TODO: 실제 변경 API 호출 가능
             });
+
 
             popup.querySelector('.cancel-btn').addEventListener('click', () => {
                 popup.remove();

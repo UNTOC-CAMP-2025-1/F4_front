@@ -8,10 +8,10 @@ export default class ProfileChange extends Phaser.Scene {
         this.load.image('background', 'assets/back.png');
         this.load.image('arrow', 'assets/arrow.png');
         this.load.image('profile1', 'assets/character.png');
-        this.load.image('profile2', 'assets/character2.png');
-        this.load.image('profile3', 'assets/character3.png');
-        this.load.image('profile4', 'assets/character4.png');
-        this.load.image('profile5', 'assets/character5.png');
+        this.load.image('profile2', 'items/skin1.png');
+        this.load.image('profile3', 'items/skin2.png');
+        this.load.image('profile4', 'items/skin3.png');
+        this.load.image('profile5', 'items/skin4.png');
     }
 
     create() {
@@ -101,10 +101,10 @@ export default class ProfileChange extends Phaser.Scene {
 
         const profileMap = {
         'assets/character.png': { profile_id: 1, profile_url: 'assets/character.png' },
-        'assets/character2.png': { profile_id: 2, profile_url: 'assets/character2.png' },
-        'assets/character3.png': { profile_id: 3, profile_url: 'assets/character3.png' },
-        'assets/character4.png': { profile_id: 4, profile_url: 'assets/character4.png' },
-        'assets/character5.png': { profile_id: 5, profile_url: 'assets/character5.png' }
+        'items/skin1.png': { profile_id: 2, profile_url: 'items/skin1.png' },
+        'items/skin2.png': { profile_id: 3, profile_url: 'items/skin2.png' },
+        'items/skin3.png': { profile_id: 4, profile_url: 'items/skin3.png' },
+        'items/skin4.png': { profile_id: 5, profile_url: 'items/skin4.png' }
         };
         
         // 배경
