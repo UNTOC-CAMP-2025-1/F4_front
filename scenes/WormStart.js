@@ -28,7 +28,6 @@ export default class WormStart extends Phaser.Scene {
     this.load.image('circle', 'assets/tiniwormbody.png');
     
     this.load.image('face',   'assets/character.png');
-    this.load.image('shadow', 'assets/food3.png');
     for (let i = 1; i <= 7; i++) {
       this.load.image(`food${i}`, `assets/food${i}.png`);
     }
