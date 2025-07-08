@@ -1,7 +1,4 @@
 // src/entities/snake.js
-import Shadow from './shadow.js';
-import Util   from '../Util.js';
-
 export default class Snake {
   /**
    * @param {Phaser.Scene} scene
@@ -34,7 +31,6 @@ export default class Snake {
     this.snakeLength = 0;
 
     // 섀도우 & 섹션 그룹 (spacing=2 → 두 칸마다 하나씩 그림자)
-    this.shadow = new Shadow(scene, this.sections, this.scale, 2);
     this.sectionGroup = scene.physics.add.group();
 
     // — 헤드 생성 (headKey 사용) —
@@ -93,7 +89,6 @@ export default class Snake {
 
     this.snakeLength++;
     this.sections.push(sec);
-    this.shadow.add(x, y);
     return sec;
   }
 
@@ -145,7 +140,6 @@ export default class Snake {
       this.onCycleComplete();
     }
 
-    this.shadow.update();
   }
 
   findNextPointIndex(currentIndex) {
@@ -177,7 +171,6 @@ export default class Snake {
       sec.setScale(scale);
       sec.body.setCircle(sec.width * 0.5);
     });
-    this.shadow.setScale(scale);
   }
 
   incrementSize() {
@@ -192,7 +185,6 @@ export default class Snake {
     // edge, 섹션, 섀도우 파괴
     this.edge.destroy();
     this.sections.forEach(sec => sec.destroy());
-    this.shadow.destroy();
 
     // destruction 콜백 호출
     this.onDestroyedCallbacks.forEach(cb => cb.func.call(cb.ctx, this));

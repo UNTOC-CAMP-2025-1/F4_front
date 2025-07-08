@@ -95,36 +95,62 @@ export default class WormStart extends Phaser.Scene {
   }
 
   update(time, delta) {
-    // 1) 각 뱀의 기본 로직 실행
-    this.snakes.forEach(s => s.update(time, delta));
+  // 1) 각 뱀 기본 로직
+  this.snakes.forEach(s => s.update(time, delta));
 
-    // 2) 수동 충돌 검사: 머리(head) ↔ 먹이
-    this.snakes.forEach(snake => {
+  // 2) 수동 충돌 검사: 머리(head) ↔ 먹이
+  this.snakes.forEach(snake => {
+    const head       = snake.head;
+    const headRadius = head.displayWidth * 0.3;
+
+    this.foodGroup.getChildren().forEach(foodSprite => {
+      const food       = foodSprite.food;
+      const foodRadius = foodSprite.displayWidth * 0.3;
+
+      if (food.attached) return;
+
+      const dist = Phaser.Math.Distance.Between(
+        head.x, head.y,
+        foodSprite.x, foodSprite.y
+      );
+
+      if (dist <= headRadius + foodRadius) {
+        // ① 기존 붙이는 로직
+        food.onHit(head);
+
+        // ② 새 먹이 랜덤 생성 (world bounds: -w..w, -h..h)
+        //    create()에서 this.worldW = w, this.worldH = h 로 저장했다고 가정
+        const x = Util.randomInt(-this.worldW, this.worldW);
+        const y = Util.randomInt(-this.worldH, this.worldH);
+        this.initFood(x, y);
+      }
+    });
+  });
+
+    // 3) **머리 ↔ 다른 뱀 몸통 충돌 (수동)**
+      this.snakes.forEach(snake => {
       const head       = snake.head;
-      const headRadius = head.displayWidth * 0.5;
+      const headRadius = head.displayWidth * 0.3;
 
-      this.foodGroup.getChildren().forEach(foodSprite => {
-        const food       = foodSprite.food;
-        const foodRadius = foodSprite.displayWidth * 0.5;
-
-        // 이미 붙은 음식은 무시
-        if (food.attached) return;
-
-        // 머리와 먹이 사이 거리 계산
-        const dist = Phaser.Math.Distance.Between(
-          head.x, head.y,
-          foodSprite.x, foodSprite.y
-        );
-
-        // 반지름 합 이내라면 충돌로 간주
-        if (dist <= headRadius + foodRadius) {
-          food.onHit(head);
-        }
+      this.snakes.forEach(other => {
+        if (other === snake) return;              // 자기 자신 제외
+        other.sections.forEach(sec => {
+          const secRadius = sec.displayWidth * 0.3;  
+          const dist = Phaser.Math.Distance.Between(
+            head.x, head.y,
+            sec.x,  sec.y
+          );
+          if (dist <= headRadius + secRadius) {
+            // 충돌하면 해당 뱀 파괴
+            snake.destroy();
+          }
+        });
       });
     });
 
-    // 3) 먹이들 업데이트 (붙은 먹이 따라다니고, 파괴 처리)
+    // 4) 먹이들 업데이트
     this.foodGroup.getChildren().forEach(sprite => sprite.food.update());
+
   }
 
   initFood(x, y) {
@@ -136,14 +162,44 @@ export default class WormStart extends Phaser.Scene {
   }
 
   snakeDestroyed(snake) {
-    // 죽은 뱀의 headPath를 따라 먹이를 재생성
-    const path = snake.headPath;
-    const len  = snake.snakeLength;
-    for (let i = 0; i < path.length; i += Math.max(1, Math.round(path.length / len) * 2)) {
-      this.initFood(
-        path[i].x + Util.randomInt(-10, 10),
-        path[i].y + Util.randomInt(-10, 10)
-      );
-    }
+  const path = snake.headPath;
+  const len  = snake.snakeLength;
+
+  // 1) 뱀 길이 비율로 생성 개수 결정 (예: 길이의 0.5%)
+  const spawnRatio = 0.1;          // 0.5% 로 설정
+  let spawnCount   = Math.floor(len * spawnRatio);
+
+  // spawnCount가 0이면 그냥 종료
+  if (spawnCount === 0) {
+    return;
   }
+
+  // 2) 경로 전체를 spawnCount 등분한 간격으로 인덱스 뽑기
+  const step        = Math.max(1, Math.floor(path.length / spawnCount));
+  const offsetRange = 60;   // 좌표 ±60px 랜덤 오프셋
+  const minDist     = 100;   // 스폰 간 최소 거리
+  const spawns      = [];
+
+  for (let i = 0; i < path.length && spawns.length < spawnCount; i += step) {
+    const base = path[i];
+    const x    = base.x + Util.randomInt(-offsetRange, offsetRange);
+    const y    = base.y + Util.randomInt(-offsetRange, offsetRange);
+
+    // 이미 선택된 위치들과 최소 거리(minDist) 체크
+    const tooClose = spawns.some(p =>
+      Phaser.Math.Distance.Between(p.x, p.y, x, y) < minDist
+    );
+    if (tooClose) continue;
+
+    spawns.push({ x, y });
+  }
+
+  // 3) 최종 선택된 위치에만 먹이 생성
+  spawns.forEach(pt => {
+    this.initFood(pt.x, pt.y);
+  });
+}
+
+
+
 }
