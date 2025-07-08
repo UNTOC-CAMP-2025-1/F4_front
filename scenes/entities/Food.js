@@ -33,7 +33,7 @@ export default class Food {
     if (!this.attached) return;
     this.sprite.x = this.head.x;
     this.sprite.y = this.head.y;
-    this.head.snake.incrementSize();
+    this.head.snake.onFoodEaten();
     this.destroy();
   }
 
