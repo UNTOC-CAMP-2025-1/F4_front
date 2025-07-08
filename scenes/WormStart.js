@@ -26,7 +26,7 @@ export default class WormStart extends Phaser.Scene {
     const h = this.scale.height;
 
     // 디버그 그래픽 (원하면 켜두세요)
-    //this.physics.world.createDebugGraphic();
+    this.physics.world.createDebugGraphic();
 
     // 카메라 & 배경
     this.cameras.main.setBounds(-w, -h, w * 2, h * 2);
@@ -77,11 +77,11 @@ export default class WormStart extends Phaser.Scene {
     // 2) 수동 충돌 검사: 머리(head) ↔ 먹이
     this.snakes.forEach(snake => {
       const head       = snake.head;
-      const headRadius = head.displayWidth * 0.5;
+      const headRadius = head.displayWidth * 0.3;
 
       this.foodGroup.getChildren().forEach(foodSprite => {
         const food       = foodSprite.food;
-        const foodRadius = foodSprite.displayWidth * 0.5;
+        const foodRadius = foodSprite.displayWidth * 0.3;
 
         // 이미 붙은 음식은 무시
         if (food.attached) return;
@@ -99,8 +99,30 @@ export default class WormStart extends Phaser.Scene {
       });
     });
 
-    // 3) 먹이들 업데이트 (붙은 먹이 따라다니고, 파괴 처리)
+    // 3) **머리 ↔ 다른 뱀 몸통 충돌 (수동)**
+      this.snakes.forEach(snake => {
+      const head       = snake.head;
+      const headRadius = head.displayWidth * 0.5;
+
+      this.snakes.forEach(other => {
+        if (other === snake) return;              // 자기 자신 제외
+        other.sections.forEach(sec => {
+          const secRadius = sec.displayWidth * 0.5;  
+          const dist = Phaser.Math.Distance.Between(
+            head.x, head.y,
+            sec.x,  sec.y
+          );
+          if (dist <= headRadius + secRadius) {
+            // 충돌하면 해당 뱀 파괴
+            snake.destroy();
+          }
+        });
+      });
+    });
+
+    // 4) 먹이들 업데이트
     this.foodGroup.getChildren().forEach(sprite => sprite.food.update());
+
   }
 
   initFood(x, y) {
