@@ -177,6 +177,9 @@ export default class WormStart extends Phaser.Scene {
   spawns.forEach(pt => {
     this.initFood(pt.x, pt.y);
   });
+
+
+
 }
 
 
