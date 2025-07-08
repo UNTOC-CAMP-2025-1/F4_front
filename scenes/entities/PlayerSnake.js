@@ -28,14 +28,13 @@ export default class PlayerSnake extends Snake {
     }, this);
   }
 
+
   spaceKeyDown() {
     this.maxSpeed = this.fastSpeed;
-    this.shadow.isLightingUp = true;
   }
 
   spaceKeyUp() {
     this.maxSpeed = this.slowSpeed;
-    this.shadow.isLightingUp = false;
   }
 
   update(time, delta) {
