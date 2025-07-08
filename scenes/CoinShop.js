@@ -190,7 +190,6 @@ export default class CoinShop extends Phaser.Scene {
             { amount: 1500, img: 'items/skin2.png' },
             { amount: 2000, img: 'items/skin3.png' },
             { amount: 2500, img: 'items/skin4.png' },
-            { amount: 3000, img: 'items/skin5.png' },
             // 원하는 만큼 추가 가능
         ];
 
@@ -595,6 +594,38 @@ export default class CoinShop extends Phaser.Scene {
                 alert("구매 요청 실패: 서버 문제 또는 네트워크 오류");
             }
         };
+
+        // 기본 이미지로 변경하는 버튼
+        this.add.dom(centerX - 420, 190).createFromHTML(`
+        <style>
+            .default-skin-btn {
+            background-color:rgba(216, 176, 247, 0.6);
+            color: white;
+            font-size: 22px;
+            font-weight: bold;
+            padding: 12px 24px;
+            border-radius: 16px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s ease, background-color 0.2s ease;
+            }
+            .default-skin-btn:hover {
+            transform: scale(1.05);
+            background-color: #9f7bc7;
+            }
+        </style>
+        <button class="default-skin-btn">기본 이미지로 변경</button>
+        `).addListener('click').on('click', function (event) {
+        if (event.target.classList.contains('default-skin-btn')) {
+            const currentUser = localStorage.getItem('currentUser');
+            if (currentUser) {
+            localStorage.setItem(`selectedHeadSkin_${currentUser}`, 'face');
+            alert("기본 머리 이미지로 변경되었습니다!");
+            } else {
+            alert("로그인 정보가 없습니다.");
+            }
+        }
+        });
 
 
 
