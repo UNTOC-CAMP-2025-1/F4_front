@@ -9,9 +9,10 @@ export default class GameOver extends Phaser.Scene {
         this.load.image('trophy', 'assets/trophy.png');
     }
 
-    create() {
+    create(data) {
         const { width, height } = this.cameras.main;
         const centerX = width / 2;
+        const score = data?.score ?? 0;  // 전달받은 점수
 
         // 배경
         this.add.image(0, 0, 'background')
@@ -78,28 +79,15 @@ export default class GameOver extends Phaser.Scene {
                     box-shadow: 0 4px 12px rgb(255, 255, 255);
                 }
             </style>
-            <div class="rank-box" id="rank-text">당신의 순위는?...</div>
+            <div class="rank-box" id="rank-text">당신의 점수는?...</div>
         `);
 
         this.time.delayedCall(1000, () => {
             const rankElement = document.getElementById('rank-text');
             if (rankElement) {
-                rankElement.textContent = '3위';  // 예시
+            rankElement.textContent = `SCORE : ${score}`;
             }
         });
-
-
-
-
-        // 나중에 실제 백엔드에서 순위 불러오기 
-        // this.loadRankFromServer(1);
-        // loadRankFromServer(userId) {
-        //   fetch(`/api/result?user_id=${userId}`)
-        //     .then(res => res.json())
-        //     .then(data => {
-        //       this.rankText.setText(`당신의 순위: ${data.rank}위`);
-        //     });
-        // }
 
         this.add.dom(centerX, height * 0.65+30).createFromHTML(`
             <style>

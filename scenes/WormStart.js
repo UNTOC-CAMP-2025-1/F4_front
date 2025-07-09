@@ -32,6 +32,7 @@ export default class WormStart extends Phaser.Scene {
       this.load.image(`food${i}`, `assets/food${i}.png`);
     }
     this.load.image('tile', 'assets/tile.png');
+    this.load.image('gamebackground', 'assets/gamebackground.png')
   }
 
   create() {
@@ -44,10 +45,12 @@ export default class WormStart extends Phaser.Scene {
     // 카메라 & 배경
     this.cameras.main.setBounds(-w, -h, w * 2, h * 2);
     this.cameras.main.setBackgroundColor('#444');
-    this.add
-      .tileSprite(-w, -h, w * 2, h * 2, 'tile')
-      .setOrigin(0)
-      .setDepth(-1);
+    // 타일 배경 추가 (전체 월드 크기로 반복)
+    this.add.tileSprite(
+      -w, -h,     // 시작 좌표 (월드 경계 시작)
+      w * 2, h * 2, // 전체 월드 사이즈
+      'gamebackground' // 배경 이미지 키
+    ).setOrigin(0).setDepth(-1);
 
     // 물리 경계
     this.physics.world.setBounds(-w, -h, w * 2, h * 2);
@@ -93,6 +96,23 @@ export default class WormStart extends Phaser.Scene {
     this.snakes.forEach(snake => {
       snake.addDestroyedCallback(this.snakeDestroyed, this);
     });
+
+      // 점수 초기값
+  this.score = 0;
+
+  // 점수 텍스트 생성
+  this.scoreText = this.add.text(
+    this.scale.width - 220, 40, // x, y 위치
+    'SCORE: 0',
+    {
+      fontSize: '32px',
+      fontFamily: 'Arial',
+      color: '#ffffff',
+      fontStyle: 'bold',
+      stroke: '#000',
+      strokeThickness: 4,
+    }
+  ).setScrollFactor(0); // 카메라 움직여도 고정됨
   }
 
   update(time, delta) {
@@ -118,6 +138,11 @@ export default class WormStart extends Phaser.Scene {
       if (dist <= headRadius + foodRadius) {
         // ① 기존 붙이는 로직
         food.onHit(head);
+
+      if (snake instanceof PlayerSnake) {
+        this.score += 50;
+        this.scoreText.setText('SCORE: ' + this.score);
+      }
 
         // ② 새 먹이 랜덤 생성 (world bounds: -w..w, -h..h)
         //    create()에서 this.worldW = w, this.worldH = h 로 저장했다고 가정
@@ -202,7 +227,7 @@ export default class WormStart extends Phaser.Scene {
 
   if (snake instanceof PlayerSnake) {
     this.time.delayedCall(1000, () => {
-      this.scene.start('GameOver');
+      this.scene.start('GameOver', { score : this.score});
     });
   }
 
@@ -210,7 +235,7 @@ export default class WormStart extends Phaser.Scene {
     const anyBotLeft = this.snakes.some(s => s instanceof BotSnake && !s.destroyed);
     if (!anyBotLeft) {
       this.time.delayedCall(1000, () => {
-        this.scene.start('GameOver');
+        this.scene.start('GameOver', { score: this.score});
       });
     }
   }
