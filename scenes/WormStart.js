@@ -36,6 +36,8 @@ export default class WormStart extends Phaser.Scene {
   }
 
   create() {
+    this.scoreSent = false
+
     const w = this.scale.width;
     const h = this.scale.height;
 
@@ -225,23 +227,49 @@ export default class WormStart extends Phaser.Scene {
     this.initFood(pt.x, pt.y);
   });
 
-  if (snake instanceof PlayerSnake) {
-    this.time.delayedCall(1000, () => {
-      this.scene.start('GameOver', { score : this.score});
-    });
-  }
+  if (this.scoreSent) return;
+  this.scoreSent = true;      
 
-  else {
+  // ✅ 점수 전송 & 씬 전환 로직
+  const sendScoreAndGoToGameOver = () => {
+
+    const token = localStorage.getItem('token');  // ✅ 누락된 부분 추가
+    const score = this.score;
+
+    fetch('http://34.169.165.241:8000/game_session/?domain=game_session', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token && { 'Authorization': `Bearer ${token}` })  
+        },
+      
+      body: JSON.stringify({
+        user_score: this.score,
+      })
+    })
+    .then(res => res.json())
+    .catch(err => {
+      console.error('❌ 점수 전송 실패:', err);
+    })
+    .finally(() => {
+      this.time.delayedCall(1000, () => {
+        this.scene.start('GameOver', { score: score });
+      });
+    });
+  };
+
+  if (snake instanceof PlayerSnake) {
+    sendScoreAndGoToGameOver();
+  } else {
     const anyBotLeft = this.snakes.some(s => s instanceof BotSnake && !s.destroyed);
     if (!anyBotLeft) {
-      this.time.delayedCall(1000, () => {
-        this.scene.start('GameOver', { score: this.score});
-      });
+      sendScoreAndGoToGameOver();
     }
   }
+}
 
 }
 
 
 
-}
+

@@ -53,10 +53,40 @@ export default class Home extends Phaser.Scene {
         </div>
         `);
 
-        this.time.delayedCall(0, () => {
-        document.getElementById('highscore-text').textContent = '12345';
-        document.getElementById('coin-text').textContent = '99';
-        });
+    this.time.delayedCall(0, async () => {
+        const token = localStorage.getItem('token');
+        const highScoreSpan = document.getElementById('highscore-text');
+        const coinSpan = document.getElementById('coin-text');
+
+        try {
+            const response = await fetch('http://34.169.165.241:8000/game_session/my?domain=game_session', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+            });
+
+            if (!response.ok) {
+            throw new Error('네트워크 응답 실패');
+            }
+
+            const data = await response.json();
+
+            if (Array.isArray(data) && data.length > 0) {
+            highScoreSpan.textContent = data[0].user_score; // ✅ 첫 번째 세션 점수
+            } else {
+            highScoreSpan.textContent = '0'; // 데이터가 없으면 기본값
+            }
+
+        } catch (err) {
+            console.error('❌ 최고 기록 불러오기 실패:', err);
+            highScoreSpan.textContent = '0';
+        }
+
+        // 코인값은 필요에 따라 아래 fetch로 따로 연결 가능
+        coinSpan.textContent = '50000';  // 예시
+    });
 
 
 

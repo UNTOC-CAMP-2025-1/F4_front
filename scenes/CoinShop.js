@@ -180,7 +180,7 @@ export default class CoinShop extends Phaser.Scene {
                     transform: translateX(-50%);
                 }
             </style>
-            <div class="coin-box">MY COIN: 0000</div>
+            <div class="coin-box">MY COIN: 50000</div>
         `);
 
         // item 정보 배열
