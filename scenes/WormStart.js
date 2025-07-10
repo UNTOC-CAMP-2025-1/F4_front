@@ -231,16 +231,6 @@ export default class WormStart extends Phaser.Scene {
         });
         this.lastLogTime = now;
       }
-
-      if (!this.lastBotInferTime) this.lastBotInferTime = 0;
-      if (now - this.lastBotInferTime >= 2000) {
-        this.snakes.forEach(snake => {
-          if (snake instanceof BotSnake && !snake.destroyed) {
-            snake.predictAndMove(this.worldW, this.worldH);
-          }
-        });
-        this.lastBotInferTime = now;
-      }
     }
 
     getActionFromPlayer(snake) {

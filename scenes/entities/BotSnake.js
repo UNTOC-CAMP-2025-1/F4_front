@@ -62,55 +62,6 @@ export default class BotSnake extends Snake {
     });
   }
 
-  predictAndMove(worldW, worldH) {
-    const x = this.head.x;
-    const y = this.head.y;
-
-    const input = {
-      state_x: 0.0,  // float
-      state_y: 0.0,  // float
-      player_x: parseFloat(((x + worldW) / (worldW * 2)).toFixed(6)),
-      player_y: parseFloat(((y + worldH) / (worldH * 2)).toFixed(6)),
-      boost: this.isBoosting ? 1.0 : 0.0  // float
-    };
-
-    console.log('🐍 Bot input (float):', input);
-
-    fetch('http://34.169.165.241:8000/AI_bot/ai/infer', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(input)
-    })
-      .then(res => {
-        if (!res.ok) {
-          return res.text().then(err => {
-            throw new Error(`HTTP ${res.status} - ${err}`);
-          });
-        }
-        return res.json();
-      })
-      .then(data => {
-        const action = data.action;
-        this.setDirection(action);
-        console.log(`🤖 Bot ${this.botNumber} → 예측된 방향: ${action}`);
-      })
-      .catch(err => {
-        console.error(`❌ Bot ${this.botNumber} 방향 예측 실패:`, err);
-      });
-  }
-
-
-
-  setDirection(action) {
-    switch (action) {
-      case 0: this.head.rotation = Math.PI;       break; // 왼쪽
-      case 1: this.head.rotation = -Math.PI / 2;  break; // 위
-      case 2: this.head.rotation = 0;             break; // 오른쪽
-      case 3: this.head.rotation = Math.PI / 2;   break; // 아래
-    }
-  }
 
 
 
