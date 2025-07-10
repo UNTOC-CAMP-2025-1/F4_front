@@ -227,11 +227,12 @@ export default class WormStart extends Phaser.Scene {
     this.initFood(pt.x, pt.y);
   });
 
-  if (this.scoreSent) return;
-  this.scoreSent = true;      
+    
 
   // ✅ 점수 전송 & 씬 전환 로직
   const sendScoreAndGoToGameOver = () => {
+    if (this.scoreSent) return;
+    this.scoreSent = true;  
 
     const token = localStorage.getItem('token');  // ✅ 누락된 부분 추가
     const score = this.score;
