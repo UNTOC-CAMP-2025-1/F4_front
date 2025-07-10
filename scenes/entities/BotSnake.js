@@ -13,7 +13,7 @@ export default class BotSnake extends Snake {
     super(scene, spriteKey, x, y);
     this.trend = 1;
   }
-
+  
   /**
    * Bot 전용 update: 랜덤으로 방향 전환한 뒤 기본 Snake 업데이트 호출
    * @param {number} time  
