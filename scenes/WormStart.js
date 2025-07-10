@@ -33,6 +33,7 @@ export default class WormStart extends Phaser.Scene {
   }
 
   create() {
+    this.logsSent = false;
     this.scoreSent = false
     this.logs = []; // AI 학습용 로그
     this.snakes = []; 
@@ -220,7 +221,7 @@ export default class WormStart extends Phaser.Scene {
 
       // update 함수의 마지막 부분
       const now = performance.now();
-      if (now - this.lastLogTime >= 3000 && this.botsReady) {
+      if (now - this.lastLogTime >= 3000) {
         this.snakes.forEach(snake => {
           const { x, y } = snake.head;
 
@@ -272,8 +273,7 @@ export default class WormStart extends Phaser.Scene {
   createAiBots(sessionId) {
     const token = localStorage.getItem('token');
     const botsToCreate = [0, 1];
-    let createdCount = 0;  // ✅ 완료된 봇 개수 추적
-    this.botsReady = false;
+
 
     botsToCreate.forEach(botNumber => {
       fetch('http://34.169.165.241:8000/AI_bot/ai/create_ai', {
@@ -293,11 +293,6 @@ export default class WormStart extends Phaser.Scene {
       })
       .then(data => {
         console.log(`Bot ${botNumber} 생성 완료:`, data);
-        createdCount++;
-        if (createdCount === botsToCreate.length) {
-          this.botsReady = true;  // ✅ 모든 봇이 생성되었을 때만 true
-          console.log("✅ 모든 봇 생성 완료. 로그 기록 시작 가능.");
-        }
       })
       .catch(err => {
         console.error(`Bot ${botNumber} 생성 실패:`, err);
@@ -306,9 +301,18 @@ export default class WormStart extends Phaser.Scene {
   }
 
   sendLogsToBackend() {
-    if (!this.logs || this.logs.length === 0 || this.logsSent) return;
+    console.log('📤 sendLogsToBackend() 진입');
+
+    if (!this.logs || this.logs.length === 0) {
+      console.warn('📭 로그가 없습니다. 전송 중단');
+      return;
+    }
+    if (this.logsSent) {
+      console.warn('🚫 이미 로그를 전송함. 중복 전송 방지');
+      return;
+    }
     if (!this.sessionId) {
-      console.warn('sessionId가 없어 로그 전송을 중단합니다.');
+      console.warn('❗ sessionId 없음. 로그 전송 중단');
       return;
     }
 
@@ -316,7 +320,7 @@ export default class WormStart extends Phaser.Scene {
 
     const token = localStorage.getItem('token');
     if (!token) {
-      console.error('토큰이 없습니다. 로그 전송 실패');
+      console.error('❌ 토큰 없음. 로그 전송 불가');
       return;
     }
 
@@ -334,12 +338,13 @@ export default class WormStart extends Phaser.Scene {
         bot_number: log.bot_number ?? -1,
       };
 
-      console.log(`로그[${i}]:`, fullLog); //개별 로그 출력
+      console.log(`🧾 로그[${i}]:`, fullLog);
       return fullLog;
     });
 
-    console.log('최종 전송 payloadArray:', payloadArray); //전체 전송 배열 출력
+    console.log('📦 최종 payloadArray 준비됨:', payloadArray);
 
+    // 🔁 실제 fetch 전송
     fetch('http://34.169.165.241:8000/bot_log/log?domain=bot_log', {
       method: 'POST',
       headers: {
@@ -348,18 +353,23 @@ export default class WormStart extends Phaser.Scene {
       },
       body: JSON.stringify(payloadArray),
     })
-      .then(res => {
-        if (!res.ok) return res.text().then(text => { throw new Error(`전체 로그 전송 실패: ${text}`); });
-        return res.json();
-      })
-      .then(data => {
-        console.log(`전체 로그 전송 성공 응답:`, data);
-        console.log(`전체 로그 전송 완료! 총 ${this.logs.length}개의 로그가 서버에 전송되었습니다.`);
-      })
-      .catch(err => {
-        console.error(`전체 로그 전송 에러:`, err);
-      });
+    .then(res => {
+      if (!res.ok) {
+        return res.text().then(text => {
+          throw new Error(`🚨 전체 로그 전송 실패: ${text}`);
+        });
+      }
+      return res.json();
+    })
+    .then(data => {
+      console.log(`✅ 전체 로그 전송 성공 응답:`, data);
+      console.log(`🎉 전체 로그 전송 완료! 총 ${this.logs.length}개의 로그가 서버에 전송되었습니다.`);
+    })
+    .catch(err => {
+      console.error(`❌ 전체 로그 전송 중 에러 발생:`, err);
+    });
   }
+
 
   snakeDestroyed(snake) {
   const path = snake.headPath;
