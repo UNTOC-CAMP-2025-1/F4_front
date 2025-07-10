@@ -620,9 +620,9 @@ export default class CoinShop extends Phaser.Scene {
             const currentUser = localStorage.getItem('currentUser');
             if (currentUser) {
             localStorage.setItem(`selectedHeadSkin_${currentUser}`, 'face');
-            alert("기본 머리 이미지로 변경되었습니다!");
+            showAlertPopup("SKIN SHOP", "기본 이미지로 변경되었습니다!");
             } else {
-            alert("로그인 정보가 없습니다.");
+            showAlertPopup("SKIN SHOP", "로그인 이후 이용해주세요.");
             }
         }
         });

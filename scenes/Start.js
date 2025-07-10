@@ -41,6 +41,76 @@ export default class Start extends Phaser.Scene {
             ease: 'Sine.easeInOut'
         });
 
+        const showAlertPopup = (title, message, onConfirm = null) => {
+            const popup = document.createElement('div');
+            popup.id = 'alert-popup';
+            popup.innerHTML = `
+                <style>
+                    #alert-popup {
+                        position: fixed;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        background-color: #fbefff;
+                        padding: 30px 50px;
+                        border-radius: 25px;
+                        font-family: Arial, sans-serif;
+                        text-align: center;
+                        z-index: 1000;
+                        box-shadow: 0 0 20px rgba(0,0,0,0.4);
+                    }
+
+                    #alert-popup h2 {
+                        font-size: 36px;
+                        font-weight: bold;
+                        color: #6b4c9a;
+                        margin-bottom: 10px;
+                    }
+
+                    #alert-popup p {
+                        font-size: 22px;
+                        margin: 20px 0;
+                        color: #444;
+                    }
+
+                    .btn-group {
+                        display: flex;
+                        justify-content: center;
+                        margin-top: 20px;
+                        gap: 20px;
+                    }
+
+                    .confirm-btn {
+                        font-size: 20px;
+                        padding: 10px 24px;
+                        border-radius: 12px;
+                        cursor: pointer;
+                        font-weight: bold;
+                        background-color: #b493d6;
+                        color: white;
+                        border: none;
+                        transition: transform 0.2s ease, background-color 0.2s ease;
+                    }
+
+                    .confirm-btn:hover {
+                        transform: scale(1.08);
+                        background-color: #9f7bc7;
+                    }
+                </style>
+                <h2>${title}</h2>
+                <p>${message}</p>
+                <div class="btn-group">
+                    <button class="confirm-btn">확인</button>
+                </div>
+            `;
+
+            document.body.appendChild(popup);
+            popup.querySelector('.confirm-btn').addEventListener('click', () => {
+                popup.remove();
+                if (onConfirm) onConfirm();
+            });
+        };
+
         // 버튼 DOM 생성
         this.add.dom(centerX, centerY + 100).createFromHTML(`
             <style>
@@ -90,7 +160,7 @@ export default class Start extends Phaser.Scene {
                         loginBtn.textContent = 'LOGOUT';
                         loginBtn.onclick = () => {
                             localStorage.removeItem('token');
-                            alert('로그아웃 되었습니다.');
+                            showAlertPopup("LOGOUT", "로그아웃 되었습니다.");
                             this.scene.restart();
                         };
 

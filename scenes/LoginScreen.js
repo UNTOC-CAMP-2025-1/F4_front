@@ -256,7 +256,7 @@ export default class LoginScreen extends Phaser.Scene {
                                 alert("인증 API 호출 실패");
                             }
                         } else if (response.status === 401) {
-                            alert('아이디나 비밀번호가 잘못되었습니다.');
+                            showAlertPopup("CHECK", "아이디나 비밀번호가 잘못되었습니다.");
                         } else {
                             alert('로그인 실패. 서버 오류');
                         }
