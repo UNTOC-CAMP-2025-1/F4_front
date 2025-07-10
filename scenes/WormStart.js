@@ -220,7 +220,7 @@ export default class WormStart extends Phaser.Scene {
 
       // update 함수의 마지막 부분
       const now = performance.now();
-      if (now - this.lastLogTime >= 2000) {
+      if (now - this.lastLogTime >= 3000) {
         this.snakes.forEach(snake => {
           const { x, y } = snake.head;
 
