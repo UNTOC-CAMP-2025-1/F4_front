@@ -220,7 +220,7 @@ export default class WormStart extends Phaser.Scene {
 
       // update 함수의 마지막 부분
       const now = performance.now();
-      if (now - this.lastLogTime >= 3000) {
+      if (now - this.lastLogTime >= 3000 && this.botsReady) {
         this.snakes.forEach(snake => {
           const { x, y } = snake.head;
 
@@ -272,6 +272,9 @@ export default class WormStart extends Phaser.Scene {
   createAiBots(sessionId) {
     const token = localStorage.getItem('token');
     const botsToCreate = [0, 1];
+    let createdCount = 0;  // ✅ 완료된 봇 개수 추적
+    this.botsReady = false;
+
     botsToCreate.forEach(botNumber => {
       fetch('http://34.169.165.241:8000/AI_bot/ai/create_ai', {
         method: 'POST',
@@ -290,6 +293,11 @@ export default class WormStart extends Phaser.Scene {
       })
       .then(data => {
         console.log(`Bot ${botNumber} 생성 완료:`, data);
+        createdCount++;
+        if (createdCount === botsToCreate.length) {
+          this.botsReady = true;  // ✅ 모든 봇이 생성되었을 때만 true
+          console.log("✅ 모든 봇 생성 완료. 로그 기록 시작 가능.");
+        }
       })
       .catch(err => {
         console.error(`Bot ${botNumber} 생성 실패:`, err);
