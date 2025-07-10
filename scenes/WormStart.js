@@ -103,22 +103,19 @@ export default class WormStart extends Phaser.Scene {
       snake.addDestroyedCallback(this.snakeDestroyed, this);
     });
 
-      // 점수 초기값
-  this.score = 0;
-
-  // 점수 텍스트 생성
-  this.scoreText = this.add.text(
-    this.scale.width - 220, 40, // x, y 위치
-    'SCORE: 0',
-    {
+    this.score = 0;
+    this.scoreText = this.add.text(this.scale.width - 220, 40, 'SCORE: 0', {
       fontSize: '32px',
       fontFamily: 'Arial',
       color: '#ffffff',
       fontStyle: 'bold',
       stroke: '#000',
       strokeThickness: 4,
-    }
-  ).setScrollFactor(0); // 카메라 움직여도 고정됨
+    }).setScrollFactor(0);
+
+    // ✅ AI 봇 생성 요청 보내기 (예시로 Date.now() 기반 session_id 사용)
+    const sessionId = Date.now();
+    this.createAiBots(sessionId);
   }
 
   update(time, delta) {
@@ -211,6 +208,34 @@ export default class WormStart extends Phaser.Scene {
     const f   = new Food(this, x, y, key);
     this.foodGroup.add(f.sprite);
     return f;
+  }
+
+  createAiBots(sessionId) {
+    const token = localStorage.getItem('token');
+    const botsToCreate = [0, 1];
+    botsToCreate.forEach(botNumber => {
+      fetch('http://34.169.165.241:8000/AI_bot/ai/create_ai', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token && { 'Authorization': `Bearer ${token}` }),
+        },
+        body: JSON.stringify({
+          session_id: sessionId,
+          bot_number: botNumber
+        })
+      })
+      .then(res => {
+        if (!res.ok) return res.text().then(text => { throw new Error(text); });
+        return res.json();
+      })
+      .then(data => {
+        console.log(`✅ Bot ${botNumber} 생성 완료:`, data);
+      })
+      .catch(err => {
+        console.error(`❌ Bot ${botNumber} 생성 실패:`, err);
+      });
+    });
   }
 
   sendLogsToBackend() {
