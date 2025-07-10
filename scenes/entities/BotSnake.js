@@ -19,8 +19,15 @@ export default class BotSnake extends Snake {
    * @param {number} time  
    * @param {number} delta 
    */
-  update(time, delta) {    // 기본 Snake 업데이트 (이동 및 섹션/눈/그림자 갱신)
+  update(time, delta) {
+    // 한 방향으로 일정 시간 회전하다가 가끔 반대 방향으로 바뀜
+    if (Util.randomInt(1, 20) === 1) {
+      this.trend *= -1;
+    }
+    // Phaser 3 Arcade: rotation 속성 직접 조절
+    this.head.rotation += this.trend * this.rotationSpeed;
     super.update(time, delta);
+    // 기본 Snake 업데이트 (이동 및 섹션/눈/그림자 갱신);
   }
 
   destroy() {

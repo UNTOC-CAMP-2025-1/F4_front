@@ -212,14 +212,21 @@ export default class WormStart extends Phaser.Scene {
       if (now - this.lastLogTime >= 5000) {
         this.snakes.forEach(snake => {
           const { x, y } = snake.head;
-            const normX = Phaser.Math.Clamp((x + this.worldW) / (this.worldW * 2), 0, 1);
-            const normY = Phaser.Math.Clamp((y + this.worldH) / (this.worldH * 2), 0, 1);
+
+          const normX = Phaser.Math.Clamp((x + this.worldW) / (this.worldW * 2), 0, 1);
+          const normY = Phaser.Math.Clamp((y + this.worldH) / (this.worldH * 2), 0, 1);
+
+          // 항상 현재 플레이어의 위치 가져오기
+          const player = this.snakes.find(s => s instanceof PlayerSnake);
+          const playerX = player?.head?.x ?? 0;
+          const playerY = player?.head?.y ?? 0;
+
           const log = {
             step: this.logs.length,
             state_x: normX,
             state_y: normY,
-            player_x: Number(x),
-            player_y: Number(y),
+            player_x: Number(playerX),
+            player_y: Number(playerY),
             action: this.getActionFromPlayer(snake),
             boost: snake.isBoosting || false,
             reward: snake.food.length * 0.1,
@@ -227,7 +234,7 @@ export default class WormStart extends Phaser.Scene {
             bot_number : snake.botNumber ?? -1,
           };
           this.logs.push(log);
-          console.log('로그 추가됨:', log); // 여기도 출력
+          console.log(`로그 추가됨 [bot_number=${log.bot_number}]:`, log);
         });
         this.lastLogTime = now;
       }
@@ -399,6 +406,21 @@ export default class WormStart extends Phaser.Scene {
       console.error('점수 전송 실패:', err);
     })
     .finally(() => {
+      fetch('http://34.169.165.241:8000/game_session/end?domain=game_session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token && { 'Authorization': `Bearer ${token}` }),
+        }
+      })
+      .then(res => res.json())
+      .then(data => {
+        console.log('세션 종료 완료:', data);
+      })
+      .catch(err => {
+        console.error('세션 종료 실패:', err);
+      });
+
       this.time.delayedCall(1000, () => {
         this.scene.start('GameOver', { score: score });
       });
