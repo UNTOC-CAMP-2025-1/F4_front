@@ -22,11 +22,8 @@ export default class WormStart extends Phaser.Scene {
     this.load.image('skin2', 'items/skin2.png');
     this.load.image('skin3', 'items/skin3.png');
     this.load.image('skin4', 'items/skin4.png');
-
-
     // 섹션, 머리, 그림자, 먹이, 타일 이미지 로드
-    this.load.image('circle', 'assets/tiniwormbody.png');
-    
+    this.load.image('circle', 'assets/tiniwormbody.png');  
     this.load.image('face',   'assets/character.png');
     for (let i = 1; i <= 7; i++) {
       this.load.image(`food${i}`, `assets/food${i}.png`);
@@ -40,11 +37,11 @@ export default class WormStart extends Phaser.Scene {
     this.logs = []; // AI 학습용 로그
     this.snakes = []; 
     this.startTime = performance.now();
-    this.lastLogTime = 0;  // ✅ 마지막 로그 저장 시각
+    this.lastLogTime = 0;  //마지막 로그 저장 시각
     
     const token = localStorage.getItem('token');
     if (!token) {
-      console.error('❌ 로그인 토큰이 없습니다.');
+      console.error('로그인 토큰이 없습니다.');
       return;
     }
 
@@ -61,11 +58,11 @@ export default class WormStart extends Phaser.Scene {
     })
     .then(data => {
       this.sessionId = data.session_id;
-      console.log('✅ 받은 session_id:', this.sessionId);
+      console.log('받은 session_id:', this.sessionId);
       this.setupGame();
     })
     .catch(err => {
-      console.error('❌ 세션 시작 실패:', err);
+      console.error('세션 시작 실패:', err);
     });
   }
 
@@ -144,7 +141,7 @@ export default class WormStart extends Phaser.Scene {
 
   update(time, delta) {
     if (!this.snakes || this.snakes.length === 0) {
-      console.warn('⚠️ this.snakes가 비어있음');
+      console.warn('this.snakes가 비어있음');
       return;
     }
 
@@ -274,10 +271,10 @@ export default class WormStart extends Phaser.Scene {
         return res.json();
       })
       .then(data => {
-        console.log(`✅ Bot ${botNumber} 생성 완료:`, data);
+        console.log(`Bot ${botNumber} 생성 완료:`, data);
       })
       .catch(err => {
-        console.error(`❌ Bot ${botNumber} 생성 실패:`, err);
+        console.error(`Bot ${botNumber} 생성 실패:`, err);
       });
     });
   }
@@ -285,7 +282,7 @@ export default class WormStart extends Phaser.Scene {
   sendLogsToBackend() {
     if (!this.logs || this.logs.length === 0 || this.logsSent) return;
     if (!this.sessionId) {
-      console.warn('❗ sessionId가 없어 로그 전송을 중단합니다.');
+      console.warn('sessionId가 없어 로그 전송을 중단합니다.');
       return;
     }
 
@@ -293,7 +290,7 @@ export default class WormStart extends Phaser.Scene {
 
     const token = localStorage.getItem('token');
     if (!token) {
-      console.error('❌ 토큰이 없습니다. 로그 전송 실패');
+      console.error('토큰이 없습니다. 로그 전송 실패');
       return;
     }
 
@@ -311,11 +308,11 @@ export default class WormStart extends Phaser.Scene {
         bot_number: log.bot_number ?? -1,
       };
 
-      console.log(`📦 로그[${i}]:`, fullLog); // 🔍 개별 로그 출력
+      console.log(`로그[${i}]:`, fullLog); //개별 로그 출력
       return fullLog;
     });
 
-    console.log('📤 최종 전송 payloadArray:', payloadArray); // 🔍 전체 전송 배열 출력
+    console.log('최종 전송 payloadArray:', payloadArray); //전체 전송 배열 출력
 
     fetch('http://34.169.165.241:8000/bot_log/log?domain=bot_log', {
       method: 'POST',
@@ -326,15 +323,15 @@ export default class WormStart extends Phaser.Scene {
       body: JSON.stringify(payloadArray),
     })
       .then(res => {
-        if (!res.ok) return res.text().then(text => { throw new Error(`🚫 전체 로그 전송 실패: ${text}`); });
+        if (!res.ok) return res.text().then(text => { throw new Error(`전체 로그 전송 실패: ${text}`); });
         return res.json();
       })
       .then(data => {
-        console.log(`✅ 전체 로그 전송 성공 응답:`, data);
-        console.log(`✅ 전체 로그 전송 완료! 총 ${this.logs.length}개의 로그가 서버에 전송되었습니다.`);
+        console.log(`전체 로그 전송 성공 응답:`, data);
+        console.log(`전체 로그 전송 완료! 총 ${this.logs.length}개의 로그가 서버에 전송되었습니다.`);
       })
       .catch(err => {
-        console.error(`❌ 전체 로그 전송 에러:`, err);
+        console.error(`전체 로그 전송 에러:`, err);
       });
   }
 
@@ -376,12 +373,12 @@ export default class WormStart extends Phaser.Scene {
     this.initFood(pt.x, pt.y);
   });
 
-  // ✅ 점수 전송 & 씬 전환 로직
+  //점수 전송 & 씬 전환 로직
   const sendScoreAndGoToGameOver = () => {
     if (this.scoreSent) return;
     this.scoreSent = true;  
 
-    const token = localStorage.getItem('token');  // ✅ 누락된 부분 추가
+    const token = localStorage.getItem('token');  //누락된 부분 추가
     const score = this.score;
 
     this.sendLogsToBackend();
@@ -399,7 +396,7 @@ export default class WormStart extends Phaser.Scene {
     })
     .then(res => res.json())
     .catch(err => {
-      console.error('❌ 점수 전송 실패:', err);
+      console.error('점수 전송 실패:', err);
     })
     .finally(() => {
       this.time.delayedCall(1000, () => {
