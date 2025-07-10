@@ -111,12 +111,23 @@ export default class WormStart extends Phaser.Scene {
     this.snakes.push(player);
     this.cameras.main.startFollow(player.head);
 
+    const botSkins = [
+      { head: 'skin1', body: 'tiniwormbody1' },
+      { head: 'skin2', body: 'tiniwormbody2' },
+      { head: 'skin3', body: 'tiniwormbody3' },
+      { head: 'skin4', body: 'tiniwormbody4' },
+      { head: 'face',  body: 'circle' } // 기본 스킨
+    ];
+
+    // 랜덤하게 두 개 뽑기 (겹치지 않게 하려면 Shuffle)
+    const [botSkin1, botSkin2] = Phaser.Utils.Array.Shuffle(botSkins).slice(0, 2);
+    
     // 봇 스네이크 2마리
-    const bot1 = new BotSnake(this, 'circle', 'face', -200, 0);
+    const bot1 = new BotSnake(this, botSkin1.body, botSkin1.head, -200, 0);
     bot1.botNumber = 0; 
     bot1.head.setScale(0.4);
 
-    const bot2 = new BotSnake(this, 'circle', 'face',  200, 0);
+    const bot2 = new BotSnake(this, botSkin2.body, botSkin2.head,  200, 0);
     bot2.botNumber = 1;
     bot2.head.setScale(0.4);
 
