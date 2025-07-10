@@ -37,11 +37,39 @@ export default class WormStart extends Phaser.Scene {
 
   create() {
     this.scoreSent = false
-
     this.logs = []; // AI 학습용 로그
+    this.snakes = []; 
     this.startTime = performance.now();
     this.lastLogTime = 0;  // ✅ 마지막 로그 저장 시각
+    
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('❌ 로그인 토큰이 없습니다.');
+      return;
+    }
 
+    fetch('http://34.169.165.241:8000/game_session/start?domain=game_session', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    })
+    .then(res => {
+      if (!res.ok) return res.text().then(t => { throw new Error(t); });
+      return res.json();
+    })
+    .then(data => {
+      this.sessionId = data.session_id;
+      console.log('✅ 받은 session_id:', this.sessionId);
+      this.setupGame();
+    })
+    .catch(err => {
+      console.error('❌ 세션 시작 실패:', err);
+    });
+  }
+
+  setupGame() {
     const w = this.scale.width;
     const h = this.scale.height;
 
@@ -51,12 +79,7 @@ export default class WormStart extends Phaser.Scene {
     // 카메라 & 배경
     this.cameras.main.setBounds(-w, -h, w * 2, h * 2);
     this.cameras.main.setBackgroundColor('#444');
-    // 타일 배경 추가 (전체 월드 크기로 반복)
-    this.add.tileSprite(
-      -w, -h,     // 시작 좌표 (월드 경계 시작)
-      w * 2, h * 2, // 전체 월드 사이즈
-      'gamebackground' // 배경 이미지 키
-    ).setOrigin(0).setDepth(-1);
+    this.add.tileSprite(-w, -h, w * 2, h * 2,'gamebackground').setOrigin(0).setDepth(-1);
 
     // 물리 경계
     this.physics.world.setBounds(-w, -h, w * 2, h * 2);
@@ -68,11 +91,7 @@ export default class WormStart extends Phaser.Scene {
     this.snakes = [];
 
     // 초기 먹이 100개 생성
-    for (let i = 0; i < 100; i++) {
-      this.initFood(
-        Util.randomInt(-w, w),
-        Util.randomInt(-h, h)
-      );
+    for (let i = 0; i < 100; i++) {this.initFood(Util.randomInt(-w, w), Util.randomInt(-h, h));
     }
 
     const currentUser = localStorage.getItem('currentUser');
@@ -111,96 +130,110 @@ export default class WormStart extends Phaser.Scene {
       fontStyle: 'bold',
       stroke: '#000',
       strokeThickness: 4,
-    }).setScrollFactor(0);
-
-    // ✅ AI 봇 생성 요청 보내기 (예시로 Date.now() 기반 session_id 사용)
-    const sessionId = Date.now();
-    this.createAiBots(sessionId);
+    }).setScrollFactor(0); 
+    this.createAiBots(this.sessionId);
   }
 
   update(time, delta) {
-  // 1) 각 뱀 기본 로직
-  this.snakes.forEach(s => s.update(time, delta));
+    if (!this.snakes || this.snakes.length === 0) {
+      console.warn('⚠️ this.snakes가 비어있음');
+      return;
+    }
 
-  // 2) 수동 충돌 검사: 머리(head) ↔ 먹이
-  this.snakes.forEach(snake => {
-    const head       = snake.head;
-    const headRadius = head.displayWidth * 0.3;
+    if (!this.snakes) return;
+    // 1) 각 뱀 기본 로직
+    this.snakes.forEach(s => s.update(time, delta));
 
-    this.foodGroup.getChildren().forEach(foodSprite => {
-      const food       = foodSprite.food;
-      const foodRadius = foodSprite.displayWidth * 0.3;
-
-      if (food.attached) return;
-
-      const dist = Phaser.Math.Distance.Between(
-        head.x, head.y,
-        foodSprite.x, foodSprite.y
-      );
-
-      if (dist <= headRadius + foodRadius) {
-        // ① 기존 붙이는 로직
-        food.onHit(head);
-
-      if (snake instanceof PlayerSnake) {
-        this.score += 50;
-        this.scoreText.setText('SCORE: ' + this.score);
-      }
-
-        // ② 새 먹이 랜덤 생성 (world bounds: -w..w, -h..h)
-        //    create()에서 this.worldW = w, this.worldH = h 로 저장했다고 가정
-        const x = Util.randomInt(-this.worldW, this.worldW);
-        const y = Util.randomInt(-this.worldH, this.worldH);
-        this.initFood(x, y);
-      }
-    });
-  });
-
-    // 3) **머리 ↔ 다른 뱀 몸통 충돌 (수동)**
-      this.snakes.forEach(snake => {
+    // 2) 수동 충돌 검사: 머리(head) ↔ 먹이
+    this.snakes.forEach(snake => {
       const head       = snake.head;
       const headRadius = head.displayWidth * 0.3;
 
-      this.snakes.forEach(other => {
-        if (other === snake) return;              // 자기 자신 제외
-        other.sections.forEach(sec => {
-          const secRadius = sec.displayWidth * 0.3;  
-          const dist = Phaser.Math.Distance.Between(
-            head.x, head.y,
-            sec.x,  sec.y
-          );
-          if (dist <= headRadius + secRadius) {
-            // 충돌하면 해당 뱀 파괴
-            snake.destroy();
-          }
-        });
+      this.foodGroup.getChildren().forEach(foodSprite => {
+        const food       = foodSprite.food;
+        const foodRadius = foodSprite.displayWidth * 0.3;
+
+        if (food.attached) return;
+
+        const dist = Phaser.Math.Distance.Between(
+          head.x, head.y,
+          foodSprite.x, foodSprite.y
+        );
+
+        if (dist <= headRadius + foodRadius) {
+          // ① 기존 붙이는 로직
+          food.onHit(head);
+
+        if (snake instanceof PlayerSnake) {
+          this.score += 50;
+          this.scoreText.setText('SCORE: ' + this.score);
+        }
+
+          // ② 새 먹이 랜덤 생성 (world bounds: -w..w, -h..h)
+          //    create()에서 this.worldW = w, this.worldH = h 로 저장했다고 가정
+          const x = Util.randomInt(-this.worldW, this.worldW);
+          const y = Util.randomInt(-this.worldH, this.worldH);
+          this.initFood(x, y);
+        }
       });
     });
 
-    // 4) 먹이들 업데이트
-    this.foodGroup.getChildren().forEach(sprite => sprite.food.update());
+      // 3) **머리 ↔ 다른 뱀 몸통 충돌 (수동)**
+        this.snakes.forEach(snake => {
+        const head       = snake.head;
+        const headRadius = head.displayWidth * 0.3;
 
-    // update 함수의 마지막 부분
-    const now = performance.now();
-    if (now - this.lastLogTime >= 5000) {
-      this.snakes.forEach(snake => {
-        const { x, y } = snake.head;
-
-        this.logs.push({
-          step: this.logs.length,
-          state_x: 0,
-          state_y: 0,
-          player_x: Number(x),
-          player_y: Number(y),
-          action: 0,
-          boost: false,
-          reward: 0,
-          event: 'move',
+        this.snakes.forEach(other => {
+          if (other === snake) return;              // 자기 자신 제외
+          other.sections.forEach(sec => {
+            const secRadius = sec.displayWidth * 0.3;  
+            const dist = Phaser.Math.Distance.Between(
+              head.x, head.y,
+              sec.x,  sec.y
+            );
+            if (dist <= headRadius + secRadius) {
+              // 충돌하면 해당 뱀 파괴
+              snake.destroy();
+            }
+          });
         });
       });
-      this.lastLogTime = now;
+
+      // 4) 먹이들 업데이트
+      this.foodGroup.getChildren().forEach(sprite => sprite.food.update());
+
+      // update 함수의 마지막 부분
+      const now = performance.now();
+      if (now - this.lastLogTime >= 5000) {
+        this.snakes.forEach(snake => {
+          const { x, y } = snake.head;
+          const log = {
+            step: this.logs.length,
+            state_x: 0,
+            state_y: 0,
+            player_x: Number(x),
+            player_y: Number(y),
+            action: this.getActionFromPlayer(snake),
+            boost: snake.isBoosting || false,
+            reward: snake.food.length * 0.1,
+            event: 'move',
+          };
+          this.logs.push(log);
+          console.log('📝 로그 추가됨:', log); // 여기도 출력
+        });
+        this.lastLogTime = now;
+      }
     }
-  }
+    
+    getActionFromPlayer(snake) {
+      const angle = Phaser.Math.Angle.Normalize(snake.head.rotation);
+      // 방향을 8방향 중 하나로 정리
+      if (angle >= -0.785 && angle < 0.785) return 0;         // 오른쪽
+      else if (angle >= 0.785 && angle < 2.356) return 1;     // 아래
+      else if (angle >= 2.356 || angle < -2.356) return 2;    // 왼쪽
+      else return 3;                                          // 위
+    }
+
 
   initFood(x, y) {
     const n   = Phaser.Math.Between(1, 7);
@@ -240,29 +273,43 @@ export default class WormStart extends Phaser.Scene {
 
   sendLogsToBackend() {
     if (!this.logs || this.logs.length === 0 || this.logsSent) return;
+    if (!this.sessionId) {
+      console.warn('❗ sessionId가 없어 로그 전송을 중단합니다.');
+      return;
+    }
+
     this.logsSent = true;
 
     const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('❌ 토큰이 없습니다. 로그 전송 실패');
+      return;
+    }
 
-    const payloadArray = this.logs.map((log) => ({
-      step: log.step,
-      state_x: log.state_x,
-      state_y: log.state_y,
-      player_x: log.player_x,
-      player_y: log.player_y,
-      action: log.action,
-      boost: log.boost,
-      reward: log.reward,
-      event: log.event
-    }));
+    const payloadArray = this.logs.map((log, i) => {
+      const fullLog = {
+        step: log.step,
+        state_x: log.state_x,
+        state_y: log.state_y,
+        player_x: log.player_x,
+        player_y: log.player_y,
+        action: log.action,
+        boost: log.boost,
+        reward: log.reward,
+        event: log.event,
+      };
 
-    console.log('📤 전송할 전체 로그 배열:', payloadArray);
+      console.log(`📦 로그[${i}]:`, fullLog); // 🔍 개별 로그 출력
+      return fullLog;
+    });
+
+    console.log('📤 최종 전송 payloadArray:', payloadArray); // 🔍 전체 전송 배열 출력
 
     fetch('http://34.169.165.241:8000/bot_log/log?domain=bot_log', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        ...(token && { 'Authorization': `Bearer ${token}` }),
+        'Authorization': `Bearer ${token}`,
       },
       body: JSON.stringify(payloadArray),
     })
@@ -277,6 +324,8 @@ export default class WormStart extends Phaser.Scene {
         console.error(`❌ 전체 로그 전송 에러:`, err);
       });
   }
+
+
 
 
 
@@ -361,9 +410,6 @@ export default class WormStart extends Phaser.Scene {
       sendScoreAndGoToGameOver();
     }
   }
-
-
-
 }
 
 
