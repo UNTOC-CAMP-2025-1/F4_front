@@ -38,6 +38,10 @@ export default class WormStart extends Phaser.Scene {
   create() {
     this.scoreSent = false
 
+    this.logs = []; // AI 학습용 로그
+    this.startTime = performance.now();
+    this.lastLogTime = 0;  // ✅ 마지막 로그 저장 시각
+
     const w = this.scale.width;
     const h = this.scale.height;
 
@@ -179,6 +183,26 @@ export default class WormStart extends Phaser.Scene {
     // 4) 먹이들 업데이트
     this.foodGroup.getChildren().forEach(sprite => sprite.food.update());
 
+    // update 함수의 마지막 부분
+    const now = performance.now();
+    if (now - this.lastLogTime >= 5000) {
+      this.snakes.forEach(snake => {
+        const { x, y } = snake.head;
+
+        this.logs.push({
+          step: this.logs.length,
+          state_x: 0,
+          state_y: 0,
+          player_x: Number(x),
+          player_y: Number(y),
+          action: 0,
+          boost: false,
+          reward: 0,
+          event: 'move',
+        });
+      });
+      this.lastLogTime = now;
+    }
   }
 
   initFood(x, y) {
@@ -188,6 +212,48 @@ export default class WormStart extends Phaser.Scene {
     this.foodGroup.add(f.sprite);
     return f;
   }
+
+  sendLogsToBackend() {
+    if (!this.logs || this.logs.length === 0 || this.logsSent) return;
+
+    const token = localStorage.getItem('token');
+
+    this.logs.forEach((log, index) => {
+      const payload = {
+        step: log.step,
+        state_x: log.state_x,
+        state_y: log.state_y,
+        player_x: log.player_x,
+        player_y: log.player_y,
+        action: log.action,
+        boost: log.boost,
+        reward: log.reward,
+        event: log.event
+      };
+
+      console.log(`📤 [STEP ${index}] 전송 로그:`, payload);
+
+      fetch('http://34.169.165.241:8000/bot_log/log', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token && { 'Authorization': `Bearer ${token}` }),
+        },
+        body: JSON.stringify(payload),
+      })
+        .then(res => {
+          if (!res.ok) throw new Error(`🚫 로그 전송 실패 at step ${index}`);
+          return res.json();
+        })
+        .then(data => {
+          console.log(`✅ [STEP ${index}] 전송 성공 응답:`, data);
+        })
+        .catch(err => {
+          console.error(`❌ [STEP ${index}] 전송 에러:`, err);
+        });
+    });
+  }
+
 
   snakeDestroyed(snake) {
   const path = snake.headPath;
@@ -237,6 +303,8 @@ export default class WormStart extends Phaser.Scene {
     const token = localStorage.getItem('token');  // ✅ 누락된 부분 추가
     const score = this.score;
 
+    this.sendLogsToBackend();
+
     fetch('http://34.169.165.241:8000/game_session/?domain=game_session', {
       method: 'POST',
       headers: {
@@ -267,7 +335,11 @@ export default class WormStart extends Phaser.Scene {
       sendScoreAndGoToGameOver();
     }
   }
+
+
+
 }
+
 
 }
 
