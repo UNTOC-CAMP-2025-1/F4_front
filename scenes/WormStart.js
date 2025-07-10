@@ -73,6 +73,9 @@ export default class WormStart extends Phaser.Scene {
     const w = this.scale.width;
     const h = this.scale.height;
 
+    this.worldW = w;
+    this.worldH = h;
+
     // 디버그 그래픽 (원하면 켜두세요)
     //this.physics.world.createDebugGraphic();
 
@@ -105,6 +108,7 @@ export default class WormStart extends Phaser.Scene {
 
 
     const player = new PlayerSnake(this, bodyTextureKey, savedSkin, 0, 0);
+    player.botNumber = -1;
     player.head.setScale(0.4);
 
     this.snakes.push(player);
@@ -112,9 +116,13 @@ export default class WormStart extends Phaser.Scene {
 
     // 봇 스네이크 2마리
     const bot1 = new BotSnake(this, 'circle', 'face', -200, 0);
+    bot1.botNumber = 0; 
     bot1.head.setScale(0.4);
+
     const bot2 = new BotSnake(this, 'circle', 'face',  200, 0);
+    bot2.botNumber = 1;
     bot2.head.setScale(0.4);
+
     this.snakes.push(bot1, bot2);
 
     // 뱀 파괴(죽음) 콜백 등록
@@ -207,16 +215,19 @@ export default class WormStart extends Phaser.Scene {
       if (now - this.lastLogTime >= 5000) {
         this.snakes.forEach(snake => {
           const { x, y } = snake.head;
+            const normX = Phaser.Math.Clamp((x + this.worldW) / (this.worldW * 2), 0, 1);
+            const normY = Phaser.Math.Clamp((y + this.worldH) / (this.worldH * 2), 0, 1);
           const log = {
             step: this.logs.length,
-            state_x: 0,
-            state_y: 0,
+            state_x: normX,
+            state_y: normY,
             player_x: Number(x),
             player_y: Number(y),
             action: this.getActionFromPlayer(snake),
             boost: snake.isBoosting || false,
             reward: snake.food.length * 0.1,
             event: 'move',
+            bot_number : snake.botNumber ?? -1,
           };
           this.logs.push(log);
           console.log('📝 로그 추가됨:', log); // 여기도 출력
@@ -224,7 +235,7 @@ export default class WormStart extends Phaser.Scene {
         this.lastLogTime = now;
       }
     }
-    
+
     getActionFromPlayer(snake) {
       const angle = Phaser.Math.Angle.Normalize(snake.head.rotation);
       // 방향을 8방향 중 하나로 정리
@@ -297,6 +308,7 @@ export default class WormStart extends Phaser.Scene {
         boost: log.boost,
         reward: log.reward,
         event: log.event,
+        bot_number: log.bot_number ?? -1,
       };
 
       console.log(`📦 로그[${i}]:`, fullLog); // 🔍 개별 로그 출력
@@ -319,16 +331,12 @@ export default class WormStart extends Phaser.Scene {
       })
       .then(data => {
         console.log(`✅ 전체 로그 전송 성공 응답:`, data);
+        console.log(`✅ 전체 로그 전송 완료! 총 ${this.logs.length}개의 로그가 서버에 전송되었습니다.`);
       })
       .catch(err => {
         console.error(`❌ 전체 로그 전송 에러:`, err);
       });
   }
-
-
-
-
-
 
   snakeDestroyed(snake) {
   const path = snake.headPath;
@@ -367,8 +375,6 @@ export default class WormStart extends Phaser.Scene {
   spawns.forEach(pt => {
     this.initFood(pt.x, pt.y);
   });
-
-    
 
   // ✅ 점수 전송 & 씬 전환 로직
   const sendScoreAndGoToGameOver = () => {
