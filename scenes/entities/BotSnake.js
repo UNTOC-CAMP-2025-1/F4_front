@@ -13,23 +13,16 @@ export default class BotSnake extends Snake {
     super(scene, spriteKey, x, y);
     this.trend = 1;
   }
-  
+
   /**
    * Bot 전용 update: 랜덤으로 방향 전환한 뒤 기본 Snake 업데이트 호출
    * @param {number} time  
    * @param {number} delta 
    */
-  update(time, delta) {
-    // 한 방향으로 일정 시간 회전하다가 가끔 반대 방향으로 바뀜
-    if (Util.randomInt(1, 20) === 1) {
-      this.trend *= -1;
-    }
-    // Phaser 3 Arcade: rotation 속성 직접 조절
-    this.head.rotation += this.trend * this.rotationSpeed;
-
-    // 기본 Snake 업데이트 (이동 및 섹션/눈/그림자 갱신)
+  update(time, delta) {    // 기본 Snake 업데이트 (이동 및 섹션/눈/그림자 갱신)
     super.update(time, delta);
   }
+
   destroy() {
     // 1) 공통 destroy: head/sec/edge 파괴 + this.deathScore 계산
     super.destroy();
@@ -68,5 +61,58 @@ export default class BotSnake extends Snake {
       this.scene.initFood(pt.x, pt.y);
     });
   }
+
+  predictAndMove(worldW, worldH) {
+    const x = this.head.x;
+    const y = this.head.y;
+
+    const input = {
+      state_x: 0.0,  // float
+      state_y: 0.0,  // float
+      player_x: parseFloat(((x + worldW) / (worldW * 2)).toFixed(6)),
+      player_y: parseFloat(((y + worldH) / (worldH * 2)).toFixed(6)),
+      boost: this.isBoosting ? 1.0 : 0.0  // float
+    };
+
+    console.log('🐍 Bot input (float):', input);
+
+    fetch('http://34.169.165.241:8000/AI_bot/ai/infer', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(input)
+    })
+      .then(res => {
+        if (!res.ok) {
+          return res.text().then(err => {
+            throw new Error(`HTTP ${res.status} - ${err}`);
+          });
+        }
+        return res.json();
+      })
+      .then(data => {
+        const action = data.action;
+        this.setDirection(action);
+        console.log(`🤖 Bot ${this.botNumber} → 예측된 방향: ${action}`);
+      })
+      .catch(err => {
+        console.error(`❌ Bot ${this.botNumber} 방향 예측 실패:`, err);
+      });
+  }
+
+
+
+  setDirection(action) {
+    switch (action) {
+      case 0: this.head.rotation = Math.PI;       break; // 왼쪽
+      case 1: this.head.rotation = -Math.PI / 2;  break; // 위
+      case 2: this.head.rotation = 0;             break; // 오른쪽
+      case 3: this.head.rotation = Math.PI / 2;   break; // 아래
+    }
+  }
+
+
+
 
 }

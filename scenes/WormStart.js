@@ -227,9 +227,19 @@ export default class WormStart extends Phaser.Scene {
             bot_number : snake.botNumber ?? -1,
           };
           this.logs.push(log);
-          console.log('📝 로그 추가됨:', log); // 여기도 출력
+          console.log('로그 추가됨:', log); // 여기도 출력
         });
         this.lastLogTime = now;
+      }
+
+      if (!this.lastBotInferTime) this.lastBotInferTime = 0;
+      if (now - this.lastBotInferTime >= 2000) {
+        this.snakes.forEach(snake => {
+          if (snake instanceof BotSnake && !snake.destroyed) {
+            snake.predictAndMove(this.worldW, this.worldH);
+          }
+        });
+        this.lastBotInferTime = now;
       }
     }
 
@@ -414,10 +424,4 @@ export default class WormStart extends Phaser.Scene {
     }
   }
 }
-
-
 }
-
-
-
-
