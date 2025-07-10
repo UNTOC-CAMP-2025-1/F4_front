@@ -215,44 +215,45 @@ export default class WormStart extends Phaser.Scene {
 
   sendLogsToBackend() {
     if (!this.logs || this.logs.length === 0 || this.logsSent) return;
+    this.logsSent = true;
 
     const token = localStorage.getItem('token');
 
-    this.logs.forEach((log, index) => {
-      const payload = {
-        step: log.step,
-        state_x: log.state_x,
-        state_y: log.state_y,
-        player_x: log.player_x,
-        player_y: log.player_y,
-        action: log.action,
-        boost: log.boost,
-        reward: log.reward,
-        event: log.event
-      };
+    const payloadArray = this.logs.map((log) => ({
+      step: log.step,
+      state_x: log.state_x,
+      state_y: log.state_y,
+      player_x: log.player_x,
+      player_y: log.player_y,
+      action: log.action,
+      boost: log.boost,
+      reward: log.reward,
+      event: log.event
+    }));
 
-      console.log(`📤 [STEP ${index}] 전송 로그:`, payload);
+    console.log('📤 전송할 전체 로그 배열:', payloadArray);
 
-      fetch('http://34.169.165.241:8000/bot_log/log', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token && { 'Authorization': `Bearer ${token}` }),
-        },
-        body: JSON.stringify(payload),
+    fetch('http://34.169.165.241:8000/bot_log/log?domain=bot_log', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token && { 'Authorization': `Bearer ${token}` }),
+      },
+      body: JSON.stringify(payloadArray),
+    })
+      .then(res => {
+        if (!res.ok) return res.text().then(text => { throw new Error(`🚫 전체 로그 전송 실패: ${text}`); });
+        return res.json();
       })
-        .then(res => {
-          if (!res.ok) throw new Error(`🚫 로그 전송 실패 at step ${index}`);
-          return res.json();
-        })
-        .then(data => {
-          console.log(`✅ [STEP ${index}] 전송 성공 응답:`, data);
-        })
-        .catch(err => {
-          console.error(`❌ [STEP ${index}] 전송 에러:`, err);
-        });
-    });
+      .then(data => {
+        console.log(`✅ 전체 로그 전송 성공 응답:`, data);
+      })
+      .catch(err => {
+        console.error(`❌ 전체 로그 전송 에러:`, err);
+      });
   }
+
+
 
 
   snakeDestroyed(snake) {
